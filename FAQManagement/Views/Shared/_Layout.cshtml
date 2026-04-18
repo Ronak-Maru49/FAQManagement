@@ -80,7 +80,7 @@
             </a>
 
             <div class="collapse ps-3" id="categoryMenu">
-                <a class="nav-link text-white" asp-controller="FaqCategory" asp-action="List">
+                <a class="nav-link text-white" asp-controller="FaqCategorys" asp-action="List">
                     📄 Category List
                 </a>
                 <a class="nav-link text-white" asp-controller="FaqCategorys" asp-action="Index">
@@ -88,8 +88,15 @@
                 </a>
             </div>
 
+            <a class="nav-link text-white mt-2 d-flex align-items-center gap-2"
+            data-bs-toggle="collapse"
+            href="#aiFaqMenu"
+            role="button"
+            aria-expanded="false"
+            aria-controls="aiFaqMenu">
+              🤖 AI Generate FAQ
+            </a>
         </div>
-
         <!-- Main Content -->
         <div class="main-content d-flex flex-column w-100">
 
