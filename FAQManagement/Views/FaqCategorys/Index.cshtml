@@ -1,0 +1,465 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Category</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: #f0f3f8;
+        }
+
+        .page-header {
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+            .page-header h5 {
+                font-weight: 700;
+                color: #1a2540;
+                margin: 0;
+            }
+
+        .breadcrumb {
+            margin: 0;
+            font-size: 0.82rem;
+        }
+
+        .breadcrumb-item a {
+            color: #5a6a85;
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: #3b6fd4;
+            font-weight: 500;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            color: #b0bbc9;
+        }
+
+        .card {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 2px 16px rgba(30,45,74,0.09);
+        }
+
+        .form-label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #1a2540;
+            margin-bottom: 0;
+            padding-top: 8px;
+        }
+
+        .form-control, .form-select {
+            border: 1.5px solid #d4dbe8;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            padding: 9px 13px;
+            color: #1a2540;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: #3b6fd4;
+                box-shadow: 0 0 0 3px rgba(59,111,212,0.11);
+            }
+
+            .form-control.is-invalid {
+                border-color: #c0392b;
+            }
+
+        .invalid-feedback {
+            font-size: 0.78rem;
+        }
+
+        /* File input */
+        .custom-file-wrapper {
+            display: flex;
+            align-items: center;
+            border: 1.5px solid #d4dbe8;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+            .custom-file-wrapper:focus-within {
+                border-color: #3b6fd4;
+                box-shadow: 0 0 0 3px rgba(59,111,212,0.11);
+            }
+
+        .custom-file-btn {
+            padding: 9px 16px;
+            background: #f0f3f8;
+            border: none;
+            border-right: 1.5px solid #d4dbe8;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1a2540;
+            white-space: nowrap;
+        }
+
+        .custom-file-label {
+            padding: 9px 13px;
+            font-size: 0.85rem;
+            color: #a3afc2;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        /* Toggle */
+        .form-check-input[type="checkbox"] {
+            width: 42px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: #3b6fd4;
+            border-color: #3b6fd4;
+        }
+
+        /* Buttons */
+        .btn-save {
+            background: #1e2d4a;
+            color: #fff;
+            padding: 9px 30px;
+            font-weight: 600;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            border: none;
+        }
+
+            .btn-save:hover {
+                background: #2c3e5d;
+                color: #fff;
+            }
+
+            .btn-save:disabled {
+                opacity: 0.65;
+                cursor: not-allowed;
+            }
+
+        .btn-reset {
+            background: #3b6fd4;
+            color: #fff;
+            padding: 9px 30px;
+            font-weight: 600;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            border: none;
+        }
+
+            .btn-reset:hover {
+                background: #2e5ab8;
+                color: #fff;
+            }
+
+        /* Image preview */
+        #imagePreview {
+            width: 88px;
+            height: 88px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1.5px solid #d4dbe8;
+        }
+
+        /* Toast */
+        .toast-container {
+            z-index: 9999;
+        }
+
+        /* Spinner */
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        hr {
+            border-color: #edf0f6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Page Header / Breadcrumb -->
+    <div class="page-header">
+        <h5><i class="bi bi-grid me-2"></i>Add Category</h5>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#"><i class="bi bi-house"></i></a></li>
+                <li class="breadcrumb-item"><a href="#">Category</a></li>
+                <li class="breadcrumb-item active">Add Category</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid px-4 py-4">
+        <div class="card p-4">
+            <div id="categoryForm">
+
+                <!-- Category Name -->
+                <div class="row mb-3 align-items-start">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">Category Name <span class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-md-9 col-lg-10">
+                        <input type="text" id="categoryName" class="form-control" placeholder="Enter Category Name" />
+                        <div class="invalid-feedback">Category Name is required.</div>
+                    </div>
+                </div>
+
+                <!-- Category Description -->
+                <div class="row mb-3 align-items-start">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">Category Description <span class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-md-9 col-lg-10">
+                        <input type="text" id="categoryDescription" class="form-control" placeholder="Enter Category Description" />
+                        <div class="invalid-feedback">Category Description is required.</div>
+                    </div>
+                </div>
+
+                <!-- Category Image -->
+                <div class="row mb-3 align-items-start">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">Category Image</label>
+                    </div>
+                    <div class="col-md-9 col-lg-10">
+                        <div class="custom-file-wrapper" onclick="document.getElementById('categoryImageInput').click()">
+                            <button type="button" class="custom-file-btn">Choose File</button>
+                            <span class="custom-file-label" id="fileLabel">No file chosen</span>
+                        </div>
+                        <input type="file" id="categoryImageInput" accept="image/*" style="display:none" />
+                        <div id="imagePreviewWrapper" class="mt-2" style="display:none">
+                            <img id="imagePreview" src="#" alt="Preview" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Sequence -->
+                <div class="row mb-3 align-items-start">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">Category Sequence <span class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-md-9 col-lg-10">
+                        <input type="number" id="categorySequence" class="form-control" placeholder="Enter Category Sequence" min="1" />
+                        <div class="invalid-feedback">Category Sequence is required and must be a positive number.</div>
+                    </div>
+                </div>
+
+                <!-- Is Parent -->
+                <div class="row mb-3 align-items-start">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">Is Parent</label>
+                    </div>
+                    <div class="col-md-9 col-lg-10 pt-1">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="isParent" onchange="handleParentToggle(this)" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parent Sequence -->
+                <div class="row mb-3 align-items-start" id="parentSequenceRow">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">Parent Sequence <span class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-md-9 col-lg-10">
+                        <input type="number" id="parentSequence" class="form-control" placeholder="Enter Parent Sequence" min="1" />
+                        <div class="invalid-feedback">Parent Sequence is required when Is Parent is enabled.</div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-save" id="saveBtn" onclick="saveCategory()">
+                        <span class="spinner-border spinner-border-sm me-1 d-none" id="saveSpinner" role="status"></span>
+                        Save
+                    </button>
+                    <button type="button" class="btn btn-reset" onclick="resetForm()">Reset</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="appToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-semibold" id="toastMsg"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = '/api/FaqCategory';
+
+        // ── Toggle parent sequence row ──
+        function handleParentToggle(checkbox) {
+            const row = document.getElementById('parentSequenceRow');
+            row.style.display = checkbox.checked ? 'none' : '';
+            if (checkbox.checked) {
+                document.getElementById('parentSequence').value = '';
+                clearError('parentSequence');
+            }
+        }
+
+        // Init on load
+        handleParentToggle(document.getElementById('isParent'));
+
+        // ── File input ──
+        document.getElementById('categoryImageInput').addEventListener('change', function () {
+            const file = this.files[0];
+            const label = document.getElementById('fileLabel');
+            const previewWrapper = document.getElementById('imagePreviewWrapper');
+            const preview = document.getElementById('imagePreview');
+
+            if (file) {
+                label.textContent = file.name;
+                label.style.color = '#1a2540';
+                const reader = new FileReader();
+                reader.onload = e => {
+                    preview.src = e.target.result;
+                    previewWrapper.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // ── Validation helpers ──
+        function setError(id) {
+            const el = document.getElementById(id);
+            el.classList.add('is-invalid');
+        }
+
+        function clearError(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('is-invalid');
+        }
+
+        function validateForm() {
+            let valid = true;
+
+            const name = document.getElementById('categoryName').value.trim();
+            name ? clearError('categoryName') : (setError('categoryName'), valid = false);
+
+            const desc = document.getElementById('categoryDescription').value.trim();
+            desc ? clearError('categoryDescription') : (setError('categoryDescription'), valid = false);
+
+            const seq = document.getElementById('categorySequence').value.trim();
+            (seq && !isNaN(seq) && parseInt(seq) >= 1) ? clearError('categorySequence') : (setError('categorySequence'), valid = false);
+
+            if (!document.getElementById('isParent').checked) {
+                const pSeq = document.getElementById('parentSequence').value.trim();
+                (pSeq && !isNaN(pSeq) && parseInt(pSeq) >= 1) ? clearError('parentSequence') : (setError('parentSequence'), valid = false);
+            }
+
+            return valid;
+        }
+
+        // ── Save ──
+        async function saveCategory() {
+            if (!validateForm()) return;
+
+            const saveBtn = document.getElementById('saveBtn');
+            const spinner = document.getElementById('saveSpinner');
+            saveBtn.disabled = true;
+            spinner.classList.remove('d-none');
+
+            // Image to base64
+            let imageBase64 = null;
+            const imageFile = document.getElementById('categoryImageInput').files[0];
+            if (imageFile) {
+                imageBase64 = await new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = e => resolve(e.target.result);
+                    reader.readAsDataURL(imageFile);
+                });
+            }
+
+            const payload = {
+                categoryName: document.getElementById('categoryName').value.trim(),
+                categoryDescription: document.getElementById('categoryDescription').value.trim(),
+                categoryImage: imageBase64,
+                categorySequence: parseInt(document.getElementById('categorySequence').value.trim()),
+                isParent: document.getElementById('isParent').checked,
+                parentSequence: !document.getElementById('isParent').checked
+                    ? parseInt(document.getElementById('parentSequence').value.trim()) || null
+                    : null
+            };
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showToast('Category created successfully!', 'success');
+                    setTimeout(() => resetForm(), 1500);
+                } else {
+                    const errMsg = result?.errors
+                        ? Object.values(result.errors).flat().join(' ')
+                        : result?.title || 'Failed to create category.';
+                    showToast(errMsg, 'danger');
+                }
+            } catch (err) {
+                showToast('Network error. Please try again.', 'danger');
+            } finally {
+                saveBtn.disabled = false;
+                spinner.classList.add('d-none');
+            }
+        }
+
+        // ── Reset ──
+        function resetForm() {
+            ['categoryName', 'categoryDescription', 'categorySequence', 'parentSequence'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.value = ''; el.classList.remove('is-invalid'); }
+            });
+            document.getElementById('isParent').checked = true;
+            handleParentToggle(document.getElementById('isParent'));
+            document.getElementById('categoryImageInput').value = '';
+            document.getElementById('fileLabel').textContent = 'No file chosen';
+            document.getElementById('fileLabel').style.color = '';
+            document.getElementById('imagePreviewWrapper').style.display = 'none';
+        }
+
+        // ── Toast ──
+        function showToast(msg, type = 'success') {
+            const toastEl = document.getElementById('appToast');
+            document.getElementById('toastMsg').textContent = msg;
+            toastEl.className = `toast align-items-center text-white border-0 bg-${type}`;
+            new bootstrap.Toast(toastEl, { delay: 3500 }).show();
+        }
+
+        // Clear errors on input
+        ['categoryName', 'categoryDescription', 'categorySequence', 'parentSequence'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', () => clearError(id));
+        });
+    </script>
+</body>
+</html>
