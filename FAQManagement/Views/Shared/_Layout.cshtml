@@ -52,14 +52,16 @@
 
         <!-- Sidebar -->
         <div class="sidebar p-3 text-white">
+
             <h4 class="mb-4">🚀 FAQ Admin</h4>
 
+            <!-- Dashboard -->
             <a class="nav-link active" asp-controller="Home" asp-action="Index">
                 🏠 Dashboard
             </a>
 
-            <!-- FAQ Dropdown -->
-            <a class="nav-link text-white" data-bs-toggle="collapse" href="#faqMenu" role="button">
+            <!-- FAQ Menu -->
+            <a class="nav-link text-white mt-2" data-bs-toggle="collapse" href="#faqMenu" role="button">
                 📋 FAQ
             </a>
 
@@ -67,11 +69,27 @@
                 <a class="nav-link text-white" asp-controller="FAQ" asp-action="List">
                     📄 FAQ List
                 </a>
-                <a class="nav-link text-white" asp-controller="FAQ" asp-action="Index">
+                <a class="nav-link text-white" asp-controller="FAQ" asp-action="Create">
                     ➕ Add FAQ
                 </a>
             </div>
+
+            <!-- FAQ Category Menu -->
+            <a class="nav-link text-white mt-2" data-bs-toggle="collapse" href="#categoryMenu" role="button">
+                📁 FAQ Categories
+            </a>
+
+            <div class="collapse ps-3" id="categoryMenu">
+                <a class="nav-link text-white" asp-controller="FaqCategory" asp-action="Index">
+                    📄 Category List
+                </a>
+                <a class="nav-link text-white" asp-controller="FaqCategory" asp-action="Create">
+                    ➕ Add Category
+                </a>
+            </div>
+
         </div>
+    </div>
 
         <!-- Main Content -->
         <div class="main-content d-flex flex-column w-100">

@@ -9,4 +9,5 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<Faq> Faqs { get; set; }
+    public DbSet<FaqCategory> FaqCategories { get; set; }
 }
