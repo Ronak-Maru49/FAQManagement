@@ -1,0 +1,158 @@
+﻿@{
+    ViewData["Title"] = "Neko AI FAQ Generator";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --cat-orange: #3B5BDB;
+            --cat-bg: #fffbf2;
+        }
+
+        body {
+            background-color: var(--cat-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2d3436;
+        }
+
+        .main-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            background: white;
+        }
+
+        .btn-neko {
+            background-color: var(--cat-orange);
+            color: white;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: 700;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+            .btn-neko:hover {
+                background-color: #3B5BDB;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(238, 82, 83, 0.3);
+                color: white;
+            }
+
+        #faqOutput {
+            background: #ffffff;
+            border-left: 6px solid var(--cat-orange);
+            border-radius: 12px;
+            padding: 25px;
+            display: none;
+            margin-top: 2rem;
+            line-height: 1.8;
+        }
+
+        .loader-container {
+            display: none;
+        }
+
+        .cat-head {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        #faqOutput h5 {
+            color: var(--cat-orange);
+            font-weight: 700;
+            margin-top: 1.5rem;
+        }
+    </style>
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 text-center">
+            <div class="cat-head">🐾</div>
+            <h1 class="fw-bold mb-1">Neko AI FAQ Generator</h1>
+            <p class="text-muted mb-5">Technical wisdom with cat puns since 2026.</p>
+
+            <div class="card main-card p-4 p-md-5">
+                <div class="text-start mb-4">
+                    <label for="topicInput" class="form-label fw-bold small text-uppercase">What should Neko research?</label>
+                    <input type="text" class="form-control form-control-lg border-2" id="topicInput" placeholder="e.g. How do GPUs work?">
+                </div>
+                <button class="btn btn-neko btn-lg w-100" id="generateBtn">
+                    Generate FAQ (Meow!)
+                </button>
+
+                <div class="loader-container mt-4" id="loader">
+                    <div class="spinner-border text-warning" role="status"></div>
+                    <p class="mt-2 text-muted italic">Neko is chasing data mice...</p>
+                </div>
+
+                <div id="faqOutput" class="text-start shadow-sm"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="importmap">
+        {
+          "imports": {
+            "@@google/generative-ai": "https://esm.run/@@google/generative-ai"
+          }
+        }
+    </script>
+
+    <script type="module">
+        import { GoogleGenerativeAI } from "@@google/generative-ai";
+
+        // --- CONFIG ---
+        // Note: In a production .NET app, you'd fetch this from UserSecrets or AppSettings via a Controller
+        const API_KEY = "AIzaSyA_5Kc3YVKLTkoCOzx6qfwnl7zUefw71Yk";
+        const genAI = new GoogleGenerativeAI(API_KEY);
+
+        const btn = document.getElementById('generateBtn');
+        const input = document.getElementById('topicInput');
+        const output = document.getElementById('faqOutput');
+        const loader = document.getElementById('loader');
+
+        function formatNekoResponse(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/### (.*?)\n/g, '<h5>$1</h5>')
+                .replace(/\n/g, '<br>');
+        }
+
+        async function generateFaq(topic) {
+            const model = genAI.getGenerativeModel({
+                model: "gemini-1.5-flash", // Reverting to flash for testing, or use gemini-pro
+                systemInstruction: "You are a playful cat named Neko. You are an AI assistant that generates FAQs. Use cat puns but keep the technical info accurate.",
+            });
+
+            const result = await model.generateContent(`Generate a 5-question FAQ about: ${topic}`);
+            const response = await result.response;
+            return response.text();
+        }
+
+        btn.addEventListener('click', async () => {
+            const topic = input.value.trim();
+            if (!topic) return alert("Neko needs a topic to hunt!");
+
+            btn.disabled = true;
+            loader.style.display = 'block';
+            output.style.display = 'none';
+
+            try {
+                const rawText = await generateFaq(topic);
+                output.innerHTML = formatNekoResponse(rawText);
+                output.style.display = 'block';
+            } catch (error) {
+                console.error(error);
+                output.innerHTML = `<div class="text-danger fw-bold text-center">🐾 Meow... the yarn ball got tangled! <br><small>${error.message}</small></div>`;
+                output.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                loader.style.display = 'none';
+            }
+        });
+    </script>
+}
