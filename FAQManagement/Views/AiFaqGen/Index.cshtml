@@ -1,153 +1,177 @@
 ﻿@{
-    ViewData["Title"] = "Neko AI FAQ Generator";
+    ViewData["Title"] = "Neko FAQ Generator";
 }
 
 @section Styles {
     <style>
         :root {
-            --cat-orange: #3B5BDB;
-            --cat-bg: #fffbf2;
+            --cat-primary: #3B5BDB;
+            --cat-bg: #fdfaf5;
         }
 
         body {
             background-color: var(--cat-bg);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #2d3436;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
-        .main-card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            background: white;
+        .neko-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
         }
 
-        .btn-neko {
-            background-color: var(--cat-orange);
-            color: white;
-            border-radius: 50px;
-            padding: 12px 30px;
-            font-weight: 700;
+        .card {
             border: none;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            background: #ffffff;
+            padding: 40px;
+        }
+
+        .cat-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .form-control {
+            border: 2px solid #eee;
+            border-radius: 12px;
+            padding: 12px 20px;
             transition: all 0.3s ease;
         }
 
-            .btn-neko:hover {
-                background-color: #3B5BDB;
+            .form-control:focus {
+                border-color: var(--cat-primary);
+                box-shadow: none;
+            }
+
+        .btn-generate {
+            background: var(--cat-primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 14px 28px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+            .btn-generate:hover {
+                background: #2b46b1;
                 transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(238, 82, 83, 0.3);
                 color: white;
             }
 
-        #faqOutput {
-            background: #ffffff;
-            border-left: 6px solid var(--cat-orange);
-            border-radius: 12px;
+        #faqResult {
+            margin-top: 30px;
             padding: 25px;
+            background: #f8f9fa;
+            border-radius: 16px;
             display: none;
-            margin-top: 2rem;
-            line-height: 1.8;
+            text-align: left;
+            border-left: 5px solid var(--cat-primary);
         }
 
-        .loader-container {
+        .loader {
             display: none;
-        }
-
-        .cat-head {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-
-        #faqOutput h5 {
-            color: var(--cat-orange);
-            font-weight: 700;
-            margin-top: 1.5rem;
+            margin-top: 20px;
         }
     </style>
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-7 text-center">
-            <div class="cat-head">🐾</div>
-            <h1 class="fw-bold mb-1">Neko AI FAQ Generator</h1>
-            <p class="text-muted mb-5">Technical wisdom with cat puns since 2026.</p>
+<div class="neko-container text-center">
+    <span class="cat-icon">🐾</span>
+    <h1 class="fw-bold">Neko AI FAQ Generator</h1>
+    <p class="text-muted mb-4">Technical wisdom, served with cat puns.</p>
 
-            <div class="card main-card p-4 p-md-5">
-                <div class="text-start mb-4">
-                    <label for="topicInput" class="form-label fw-bold small text-uppercase">What should Neko research?</label>
-                    <input type="text" class="form-control form-control-lg border-2" id="topicInput" placeholder="e.g. How do GPUs work?">
-                </div>
-                <button class="btn btn-neko btn-lg w-100" id="generateBtn">
-                    Generate FAQ (Meow!)
-                </button>
-
-                <div class="loader-container mt-4" id="loader">
-                    <div class="spinner-border text-warning" role="status"></div>
-                    <p class="mt-2 text-muted italic">Neko is chasing data mice...</p>
-                </div>
-
-                <div id="faqOutput" class="text-start shadow-sm"></div>
-            </div>
+    <div class="card">
+        <div class="text-start">
+            <label class="form-label fw-bold small text-uppercase">What should Neko research today?</label>
+            <input type="text" id="topicInput" class="form-control" placeholder="e.g. How do Databases work?">
         </div>
+
+        <button id="generateBtn" class="btn btn-generate">
+            Generate FAQ (Meow!)
+        </button>
+
+        <div id="loader" class="loader">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Neko is hunting for data mice...</p>
+        </div>
+
+        <div id="faqResult"></div>
     </div>
 </div>
 
 @section Scripts {
-    <script type="importmap">
-        {
-          "imports": {
-            "@@google/generative-ai": "https://esm.run/@@google/generative-ai"
-          }
-        }
-    </script>
-
     <script type="module">
-        import { GoogleGenerativeAI } from "@@google/generative-ai";
-
-        // --- CONFIG ---
-        // Note: In a production .NET app, you'd fetch this from UserSecrets or AppSettings via a Controller
-        const API_KEY = "AIzaSyA_5Kc3YVKLTkoCOzx6qfwnl7zUefw71Yk";
-        const genAI = new GoogleGenerativeAI(API_KEY);
+        const API_KEY = "AIzaSyCc8-5_T96AySKTpYy4oUWeOcqOuEn-6V4"; 
+        const BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 
         const btn = document.getElementById('generateBtn');
         const input = document.getElementById('topicInput');
-        const output = document.getElementById('faqOutput');
+        const output = document.getElementById('faqResult');
         const loader = document.getElementById('loader');
 
-        function formatNekoResponse(text) {
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/### (.*?)\n/g, '<h5>$1</h5>')
-                .replace(/\n/g, '<br>');
+        // Sabse pehle check karte hain aapke liye kaunse models available hain
+        async function getAvailableModel() {
+            const response = await fetch(`${BASE_URL}/models?key=${API_KEY}`);
+            const data = await response.json();
+            
+            if (!data.models) throw new Error("API Key issue: No models found at all!");
+
+            // Hum flash ya pro model dhundenge jo generateContent support karta ho
+            const model = data.models.find(m => 
+                m.supportedGenerationMethods.includes("generateContent") && 
+                (m.name.includes("flash") || m.name.includes("pro"))
+            );
+
+            return model ? model.name : null;
         }
 
         async function generateFaq(topic) {
-            const model = genAI.getGenerativeModel({
-                model: "gemini-1.5-flash", // Reverting to flash for testing, or use gemini-pro
-                systemInstruction: "You are a playful cat named Neko. You are an AI assistant that generates FAQs. Use cat puns but keep the technical info accurate.",
+            const activeModel = await getAvailableModel();
+            if (!activeModel) throw new Error("No compatible models found for this key.");
+            
+            console.log("Neko is using model:", activeModel);
+
+            const prompt = {
+                contents: [{ parts: [{ text: `You are a playful cat named Neko. Generate a 5-question FAQ about: ${topic}. Use cat puns.` }] }]
+            };
+
+            const response = await fetch(`${BASE_URL}/${activeModel}:generateContent?key=${API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(prompt)
             });
 
-            const result = await model.generateContent(`Generate a 5-question FAQ about: ${topic}`);
-            const response = await result.response;
-            return response.text();
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
         }
 
         btn.addEventListener('click', async () => {
             const topic = input.value.trim();
-            if (!topic) return alert("Neko needs a topic to hunt!");
+            if (!topic) return alert("Neko needs a topic!");
 
             btn.disabled = true;
             loader.style.display = 'block';
             output.style.display = 'none';
 
             try {
-                const rawText = await generateFaq(topic);
-                output.innerHTML = formatNekoResponse(rawText);
+                const faqText = await generateFaq(topic);
+                output.innerHTML = faqText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 output.style.display = 'block';
             } catch (error) {
-                console.error(error);
-                output.innerHTML = `<div class="text-danger fw-bold text-center">🐾 Meow... the yarn ball got tangled! <br><small>${error.message}</small></div>`;
+                console.error("Debug Error:", error);
+                output.innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>🐾 Neko's Diagnostic Report:</strong><br>
+                        <small>${error.message}</small><hr>
+                        <p class="small">Bhai, Google aapki key ko models nahi dikha raha. <br>
+                        <strong>Solution:</strong> <a href="https://aistudio.google.com/app/apikey" target="_blank">Yahan click karo</a> aur <strong>"Create API key in NEW project"</strong> button dabao. Nayi key 100% chalegi!</p>
+                    </div>`;
                 output.style.display = 'block';
             } finally {
                 btn.disabled = false;
