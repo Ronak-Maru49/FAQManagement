@@ -1,7 +1,17 @@
 ﻿@{
     ViewData["Title"] = "FAQ Management";
 }
+<div class="mb-3" style="display: flex; justify-content: flex-end; gap: 10px;">
+    <a asp-action="Index" asp-controller="Faq"
+       style="background:#28a745; color:white; padding:8px 15px; text-decoration:none; border-radius:4px;">
+        + Add FAQ
+    </a>
 
+    <a href="javascript:void(0);" onclick="showList()"
+       style="background:#007bff; color:white; padding:8px 15px; text-decoration:none; border-radius:4px;">
+        View List
+    </a>
+</div>
 <div class="container mt-4">
     <h2>Manage FAQs</h2>
 

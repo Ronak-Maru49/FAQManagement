@@ -1,7 +1,11 @@
 ﻿@{
     ViewData["Title"] = "Add FAQ Sections";
 }
-
+<a asp-controller="Faq" asp-action="List"
+   class="btn btn-primary float-end"
+   style="background-color: #0d6efd; padding: 8px 20px; border-radius: 8px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;">
+    ← Back
+</a>
 <div class="container mt-4">
     <h2>Add FAQ Sections</h2>
     <p class="text-muted">Select the main category in the first section. You can define specific sub-categories for each item.</p>
