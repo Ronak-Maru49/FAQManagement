@@ -86,7 +86,7 @@
     }
 
     .btn-edit {
-        background-color: #28a745;
+        background-color: #0D6EFD;
         border: none;
         color: white;
         width: 32px;
@@ -101,7 +101,7 @@
     }
 
         .btn-edit:hover {
-            background-color: #218838;
+            background-color: #0D6EFD;
         }
 
     .btn-delete {
@@ -124,7 +124,7 @@
         }
 
     .btn-add {
-        background-color: #28a745;
+        background-color: #0D6EFD;
         border: none;
         color: white;
         padding: 7px 18px;
@@ -136,11 +136,11 @@
     }
 
         .btn-add:hover {
-            background-color: #218838;
+            background-color: #0D6EFD;
         }
 
     .modal-header {
-        background-color: #28a745;
+        background-color: #0D6EFD;
         color: white;
         border-radius: 8px 8px 0 0;
     }
@@ -181,9 +181,9 @@
 
         <!-- Top bar: Add Button -->
         <div class="d-flex justify-content-end mb-3">
-            <button class="btn-add" data-bs-toggle="modal" data-bs-target="#categoryModal" onclick="openAddModal()">
+            <a class="btn-add text-decoration-none" asp-action="Index" asp-controller="FaqCategorys">
                 + Add Category
-            </button>
+            </a>
         </div>
 
         <!-- Loading Spinner -->
@@ -215,11 +215,8 @@
                 <tbody id="categoryTableBody"></tbody>
             </table>
         </div>
-
     </div>
 </div>
-
-
 <!-- ── ADD / EDIT MODAL ─────────────────────────────────────────────── -->
 <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered">

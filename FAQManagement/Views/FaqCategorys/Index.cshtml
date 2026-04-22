@@ -6,200 +6,16 @@
     <title>Add Category</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
-    <style>
-        body {
-            background: #f0f3f8;
-        }
-
-        .page-header {
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 14px 28px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-            .page-header h5 {
-                font-weight: 700;
-                color: #1a2540;
-                margin: 0;
-            }
-
-        .breadcrumb {
-            margin: 0;
-            font-size: 0.82rem;
-        }
-
-        .breadcrumb-item a {
-            color: #5a6a85;
-            text-decoration: none;
-        }
-
-        .breadcrumb-item.active {
-            color: #3b6fd4;
-            font-weight: 500;
-        }
-
-        .breadcrumb-item + .breadcrumb-item::before {
-            color: #b0bbc9;
-        }
-
-        .card {
-            border: none;
-            border-radius: 14px;
-            box-shadow: 0 2px 16px rgba(30,45,74,0.09);
-        }
-
-        .form-label {
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: #1a2540;
-            margin-bottom: 0;
-            padding-top: 8px;
-        }
-
-        .form-control, .form-select {
-            border: 1.5px solid #d4dbe8;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            padding: 9px 13px;
-            color: #1a2540;
-        }
-
-            .form-control:focus, .form-select:focus {
-                border-color: #3b6fd4;
-                box-shadow: 0 0 0 3px rgba(59,111,212,0.11);
-            }
-
-            .form-control.is-invalid {
-                border-color: #c0392b;
-            }
-
-        .invalid-feedback {
-            font-size: 0.78rem;
-        }
-
-        /* File input */
-        .custom-file-wrapper {
-            display: flex;
-            align-items: center;
-            border: 1.5px solid #d4dbe8;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #fff;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-
-            .custom-file-wrapper:focus-within {
-                border-color: #3b6fd4;
-                box-shadow: 0 0 0 3px rgba(59,111,212,0.11);
-            }
-
-        .custom-file-btn {
-            padding: 9px 16px;
-            background: #f0f3f8;
-            border: none;
-            border-right: 1.5px solid #d4dbe8;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #1a2540;
-            white-space: nowrap;
-        }
-
-        .custom-file-label {
-            padding: 9px 13px;
-            font-size: 0.85rem;
-            color: #a3afc2;
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            user-select: none;
-        }
-
-        /* Toggle */
-        .form-check-input[type="checkbox"] {
-            width: 42px;
-            height: 24px;
-            cursor: pointer;
-        }
-
-        .form-check-input:checked {
-            background-color: #3b6fd4;
-            border-color: #3b6fd4;
-        }
-
-        /* Buttons */
-        .btn-save {
-            background: #1e2d4a;
-            color: #fff;
-            padding: 9px 30px;
-            font-weight: 600;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            border: none;
-        }
-
-            .btn-save:hover {
-                background: #2c3e5d;
-                color: #fff;
-            }
-
-            .btn-save:disabled {
-                opacity: 0.65;
-                cursor: not-allowed;
-            }
-
-        .btn-reset {
-            background: #3b6fd4;
-            color: #fff;
-            padding: 9px 30px;
-            font-weight: 600;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            border: none;
-        }
-
-            .btn-reset:hover {
-                background: #2e5ab8;
-                color: #fff;
-            }
-
-        /* Image preview */
-        #imagePreview {
-            width: 88px;
-            height: 88px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1.5px solid #d4dbe8;
-        }
-
-        /* Toast */
-        .toast-container {
-            z-index: 9999;
-        }
-
-        /* Spinner */
-        .spinner-border-sm {
-            width: 1rem;
-            height: 1rem;
-        }
-
-        hr {
-            border-color: #edf0f6;
-        }
-    </style>
+    <link href="~/css/FaqCategory.css" rel="stylesheet" />
 </head>
 <body>
 
-    <!-- Page Header / Breadcrumb -->
+    <!-- Page Header -->
     <div class="page-header">
         <h5><i class="bi bi-grid me-2"></i>Add Category</h5>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#"><i class="bi bi-house"></i></a></li>
+                <li class="breadcrumb-item"><a asp-action="List" asp-controller="FaqCategorys"><i class="bi bi-house"></i></a></li>
                 <li class="breadcrumb-item"><a href="#">Category</a></li>
                 <li class="breadcrumb-item active">Add Category</li>
             </ol>
@@ -209,93 +25,37 @@
     <!-- Main Content -->
     <div class="container-fluid px-4 py-4">
         <div class="card p-4">
-            <div id="categoryForm">
 
-                <!-- Category Name -->
-                <div class="row mb-3 align-items-start">
-                    <div class="col-md-3 col-lg-2">
-                        <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                    </div>
-                    <div class="col-md-9 col-lg-10">
-                        <input type="text" id="categoryName" class="form-control" placeholder="Enter Category Name" />
-                        <div class="invalid-feedback">Category Name is required.</div>
-                    </div>
+            <!-- Header row -->
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="fw-bold text-dark" style="font-size:0.95rem;">Categories</span>
+                    <span class="count-badge" id="countBadge">1 category</span>
                 </div>
-
-                <!-- Category Description -->
-                <div class="row mb-3 align-items-start">
-                    <div class="col-md-3 col-lg-2">
-                        <label class="form-label">Category Description <span class="text-danger">*</span></label>
-                    </div>
-                    <div class="col-md-9 col-lg-10">
-                        <input type="text" id="categoryDescription" class="form-control" placeholder="Enter Category Description" />
-                        <div class="invalid-feedback">Category Description is required.</div>
-                    </div>
-                </div>
-
-                <!-- Category Image -->
-                <div class="row mb-3 align-items-start">
-                    <div class="col-md-3 col-lg-2">
-                        <label class="form-label">Category Image</label>
-                    </div>
-                    <div class="col-md-9 col-lg-10">
-                        <div class="custom-file-wrapper" onclick="document.getElementById('categoryImageInput').click()">
-                            <button type="button" class="custom-file-btn">Choose File</button>
-                            <span class="custom-file-label" id="fileLabel">No file chosen</span>
-                        </div>
-                        <input type="file" id="categoryImageInput" accept="image/*" style="display:none" />
-                        <div id="imagePreviewWrapper" class="mt-2" style="display:none">
-                            <img id="imagePreview" src="#" alt="Preview" />
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Category Sequence -->
-                <div class="row mb-3 align-items-start">
-                    <div class="col-md-3 col-lg-2">
-                        <label class="form-label">Category Sequence <span class="text-danger">*</span></label>
-                    </div>
-                    <div class="col-md-9 col-lg-10">
-                        <input type="number" id="categorySequence" class="form-control" placeholder="Enter Category Sequence" min="1" />
-                        <div class="invalid-feedback">Category Sequence is required and must be a positive number.</div>
-                    </div>
-                </div>
-
-                <!-- Is Parent -->
-                <div class="row mb-3 align-items-start">
-                    <div class="col-md-3 col-lg-2">
-                        <label class="form-label">Is Parent</label>
-                    </div>
-                    <div class="col-md-9 col-lg-10 pt-1">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="isParent" onchange="handleParentToggle(this)" />
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Parent Sequence -->
-                <div class="row mb-3 align-items-start" id="parentSequenceRow">
-                    <div class="col-md-3 col-lg-2">
-                        <label class="form-label">Parent Sequence <span class="text-danger">*</span></label>
-                    </div>
-                    <div class="col-md-9 col-lg-10">
-                        <input type="number" id="parentSequence" class="form-control" placeholder="Enter Parent Sequence" min="1" />
-                        <div class="invalid-feedback">Parent Sequence is required when Is Parent is enabled.</div>
-                    </div>
-                </div>
-
-                <hr />
-
-                <!-- Buttons -->
-                <div class="d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-save" id="saveBtn" onclick="saveCategory()">
-                        <span class="spinner-border spinner-border-sm me-1 d-none" id="saveSpinner" role="status"></span>
-                        Save
-                    </button>
-                    <button type="button" class="btn btn-reset" onclick="resetForm()">Reset</button>
-                </div>
-
             </div>
+
+            <!-- Category blocks container -->
+            <div id="categoriesContainer" class="d-flex flex-column gap-3"></div>
+
+            <!-- Add More -->
+            <div class="mt-3">
+                <button class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1 px-2 py-1" onclick="addCategoryBlock()">
+                    <i class="bi bi-plus-circle-fill"></i>
+                    Add Category
+                </button>
+            </div>
+
+            <hr class="mt-4" />
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-save" id="saveBtn" onclick="saveAllCategories()">
+                    <span class="spinner-border spinner-border-sm me-1 d-none" id="saveSpinner" role="status"></span>
+                    Save All
+                </button>
+                <button type="button" class="btn btn-reset" onclick="resetAll()">Reset All</button>
+            </div>
+
         </div>
     </div>
 
@@ -312,82 +72,200 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const API_BASE = '/api/FaqCategory';
+        let blockCounter = 0;
 
-        // ── Toggle parent sequence row ──
-        function handleParentToggle(checkbox) {
-            const row = document.getElementById('parentSequenceRow');
-            row.style.display = checkbox.checked ? 'none' : '';
-            if (checkbox.checked) {
-                document.getElementById('parentSequence').value = '';
-                clearError('parentSequence');
+        // ── Build one category block ──
+        function createBlockHTML(id) {
+            return `
+            <div class="category-block" id="block-${id}">
+                <div class="block-header">
+                    <div class="block-title">
+                        <span class="block-number" id="num-${id}">1</span>
+                        Category Details
+                    </div>
+                    <button class="btn-remove-block" onclick="removeBlock(${id})" id="removebtn-${id}" style="display:none">
+                        <i class="bi bi-trash3"></i> Remove
+                    </button>
+                </div>
+
+                <!-- Category Name -->
+                <div class="row mb-3 align-items-start">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">Category Name <span class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-md-9 col-lg-10">
+                        <input type="text" id="categoryName-${id}" class="form-control" placeholder="Enter Category Name" oninput="clearErr('categoryName-${id}')" />
+                        <div class="invalid-feedback">Category Name is required.</div>
+                    </div>
+                </div>
+
+                <!-- Category Description -->
+                <div class="row mb-3 align-items-start">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">Category Description <span class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-md-9 col-lg-10">
+                        <input type="text" id="categoryDescription-${id}" class="form-control" placeholder="Enter Category Description" oninput="clearErr('categoryDescription-${id}')" />
+                        <div class="invalid-feedback">Category Description is required.</div>
+                    </div>
+                </div>
+
+                <!-- Category Image -->
+                <div class="row mb-3 align-items-start">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">Category Image</label>
+                    </div>
+                    <div class="col-md-9 col-lg-10">
+                        <div class="custom-file-wrapper" onclick="document.getElementById('imageInput-${id}').click()">
+                            <button type="button" class="custom-file-btn">Choose File</button>
+                            <span class="custom-file-label" id="fileLabel-${id}">No file chosen</span>
+                        </div>
+                        <input type="file" id="imageInput-${id}" accept="image/*" style="display:none" onchange="handleFileChange(${id}, this)" />
+                        <div id="previewWrapper-${id}" class="mt-2" style="display:none">
+                            <img id="imgPreview-${id}" class="img-preview" src="#" alt="Preview" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Sequence -->
+                <div class="row mb-3 align-items-start">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">Category Sequence <span class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-md-9 col-lg-10">
+                        <input type="number" id="categorySequence-${id}" class="form-control" placeholder="Enter Category Sequence" min="1" oninput="clearErr('categorySequence-${id}')" />
+                        <div class="invalid-feedback">Category Sequence is required and must be a positive number.</div>
+                    </div>
+                </div>
+
+                <!-- Is Parent -->
+                <div class="row mb-3 align-items-start">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">Is Parent</label>
+                    </div>
+                    <div class="col-md-9 col-lg-10 pt-1">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="isParent-${id}" onchange="handleParentToggle(${id}, this)" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parent Sequence -->
+                <div class="row mb-3 align-items-start" id="parentSeqRow-${id}">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">Parent Sequence <span class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-md-9 col-lg-10">
+                        <input type="number" id="parentSequence-${id}" class="form-control" placeholder="Enter Parent Sequence" min="1" oninput="clearErr('parentSequence-${id}')" />
+                        <div class="invalid-feedback">Parent Sequence is required when Is Parent is disabled.</div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        // ── Add block ──
+        function addCategoryBlock() {
+            blockCounter++;
+            const container = document.getElementById('categoriesContainer');
+            const div = document.createElement('div');
+            div.innerHTML = createBlockHTML(blockCounter);
+            container.appendChild(div.firstElementChild);
+
+            // Init toggle state
+            handleParentToggle(blockCounter, document.getElementById(`isParent-${blockCounter}`));
+            updateBlockNumbers();
+        }
+
+        // ── Remove block ──
+        function removeBlock(id) {
+            const el = document.getElementById(`block-${id}`);
+            if (el) {
+                el.style.transition = 'opacity 0.18s, transform 0.18s';
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(-8px)';
+                setTimeout(() => { el.remove(); updateBlockNumbers(); }, 180);
             }
         }
 
-        // Init on load
-        handleParentToggle(document.getElementById('isParent'));
+        // ── Renumber blocks & toggle remove buttons ──
+        function updateBlockNumbers() {
+            const blocks = document.querySelectorAll('.category-block');
+            const count = blocks.length;
+            blocks.forEach((block, i) => {
+                const id = block.id.replace('block-', '');
+                const numEl = document.getElementById(`num-${id}`);
+                if (numEl) numEl.textContent = i + 1;
+                const removeBtn = document.getElementById(`removebtn-${id}`);
+                if (removeBtn) removeBtn.style.display = count > 1 ? '' : 'none';
+            });
+            const badge = document.getElementById('countBadge');
+            badge.textContent = count === 1 ? '1 category' : `${count} categories`;
+        }
 
-        // ── File input ──
-        document.getElementById('categoryImageInput').addEventListener('change', function () {
-            const file = this.files[0];
-            const label = document.getElementById('fileLabel');
-            const previewWrapper = document.getElementById('imagePreviewWrapper');
-            const preview = document.getElementById('imagePreview');
+        // ── Toggle parent sequence row ──
+        function handleParentToggle(id, checkbox) {
+            const row = document.getElementById(`parentSeqRow-${id}`);
+            if (!row) return;
+            row.style.display = checkbox.checked ? 'none' : '';
+            if (checkbox.checked) {
+                const el = document.getElementById(`parentSequence-${id}`);
+                if (el) { el.value = ''; clearErr(`parentSequence-${id}`); }
+            }
+        }
 
+        // ── File change ──
+        function handleFileChange(id, input) {
+            const file = input.files[0];
+            const label = document.getElementById(`fileLabel-${id}`);
+            const wrapper = document.getElementById(`previewWrapper-${id}`);
+            const preview = document.getElementById(`imgPreview-${id}`);
             if (file) {
                 label.textContent = file.name;
                 label.style.color = '#1a2540';
                 const reader = new FileReader();
-                reader.onload = e => {
-                    preview.src = e.target.result;
-                    previewWrapper.style.display = 'block';
-                };
+                reader.onload = e => { preview.src = e.target.result; wrapper.style.display = 'block'; };
                 reader.readAsDataURL(file);
             }
-        });
-
-        // ── Validation helpers ──
-        function setError(id) {
-            const el = document.getElementById(id);
-            el.classList.add('is-invalid');
         }
 
-        function clearError(id) {
+        // ── Validation helpers ──
+        function clearErr(id) {
             const el = document.getElementById(id);
             if (el) el.classList.remove('is-invalid');
         }
+        function setErr(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('is-invalid');
+        }
 
-        function validateForm() {
+        function validateBlock(id) {
             let valid = true;
 
-            const name = document.getElementById('categoryName').value.trim();
-            name ? clearError('categoryName') : (setError('categoryName'), valid = false);
+            const name = document.getElementById(`categoryName-${id}`)?.value.trim();
+            name ? clearErr(`categoryName-${id}`) : (setErr(`categoryName-${id}`), valid = false);
 
-            const desc = document.getElementById('categoryDescription').value.trim();
-            desc ? clearError('categoryDescription') : (setError('categoryDescription'), valid = false);
+            const desc = document.getElementById(`categoryDescription-${id}`)?.value.trim();
+            desc ? clearErr(`categoryDescription-${id}`) : (setErr(`categoryDescription-${id}`), valid = false);
 
-            const seq = document.getElementById('categorySequence').value.trim();
-            (seq && !isNaN(seq) && parseInt(seq) >= 1) ? clearError('categorySequence') : (setError('categorySequence'), valid = false);
+            const seq = document.getElementById(`categorySequence-${id}`)?.value.trim();
+            (seq && !isNaN(seq) && parseInt(seq) >= 1)
+                ? clearErr(`categorySequence-${id}`)
+                : (setErr(`categorySequence-${id}`), valid = false);
 
-            if (!document.getElementById('isParent').checked) {
-                const pSeq = document.getElementById('parentSequence').value.trim();
-                (pSeq && !isNaN(pSeq) && parseInt(pSeq) >= 1) ? clearError('parentSequence') : (setError('parentSequence'), valid = false);
+            if (!document.getElementById(`isParent-${id}`)?.checked) {
+                const pSeq = document.getElementById(`parentSequence-${id}`)?.value.trim();
+                (pSeq && !isNaN(pSeq) && parseInt(pSeq) >= 1)
+                    ? clearErr(`parentSequence-${id}`)
+                    : (setErr(`parentSequence-${id}`), valid = false);
             }
 
             return valid;
         }
 
-        // ── Save ──
-        async function saveCategory() {
-            if (!validateForm()) return;
-
-            const saveBtn = document.getElementById('saveBtn');
-            const spinner = document.getElementById('saveSpinner');
-            saveBtn.disabled = true;
-            spinner.classList.remove('d-none');
-
-            // Image to base64
+        // ── Get payload for one block ──
+        async function getBlockPayload(id) {
             let imageBase64 = null;
-            const imageFile = document.getElementById('categoryImageInput').files[0];
+            const imageFile = document.getElementById(`imageInput-${id}`)?.files[0];
             if (imageFile) {
                 imageBase64 = await new Promise(resolve => {
                     const reader = new FileReader();
@@ -395,34 +273,55 @@
                     reader.readAsDataURL(imageFile);
                 });
             }
-
-            const payload = {
-                categoryName: document.getElementById('categoryName').value.trim(),
-                categoryDescription: document.getElementById('categoryDescription').value.trim(),
+            return {
+                categoryName: document.getElementById(`categoryName-${id}`).value.trim(),
+                categoryDescription: document.getElementById(`categoryDescription-${id}`).value.trim(),
                 categoryImage: imageBase64,
-                categorySequence: parseInt(document.getElementById('categorySequence').value.trim()),
-                isParent: document.getElementById('isParent').checked,
-                parentSequence: !document.getElementById('isParent').checked
-                    ? parseInt(document.getElementById('parentSequence').value.trim()) || null
+                categorySequence: parseInt(document.getElementById(`categorySequence-${id}`).value.trim()),
+                isParent: document.getElementById(`isParent-${id}`).checked,
+                parentSequence: !document.getElementById(`isParent-${id}`).checked
+                    ? parseInt(document.getElementById(`parentSequence-${id}`).value.trim()) || null
                     : null
             };
+        }
+
+        // ── Get all block IDs ──
+        function getAllBlockIds() {
+            return [...document.querySelectorAll('.category-block')].map(b => b.id.replace('block-', ''));
+        }
+
+        // ── Save All ──
+        async function saveAllCategories() {
+            const ids = getAllBlockIds();
+            let allValid = true;
+            ids.forEach(id => { if (!validateBlock(id)) allValid = false; });
+            if (!allValid) { showToast('Please fix the errors before saving.', 'danger'); return; }
+
+            const saveBtn = document.getElementById('saveBtn');
+            const spinner = document.getElementById('saveSpinner');
+            saveBtn.disabled = true;
+            spinner.classList.remove('d-none');
 
             try {
-                const response = await fetch(API_BASE, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                const payloads = await Promise.all(ids.map(id => getBlockPayload(id)));
 
-                const result = await response.json();
+                // Send each as separate POST (or change to bulk endpoint as needed)
+                const results = await Promise.all(payloads.map(payload =>
+                    fetch(API_BASE, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    }).then(r => r.json().then(data => ({ ok: r.ok, data })))
+                ));
 
-                if (response.ok) {
-                    showToast('Category created successfully!', 'success');
-                    setTimeout(() => resetForm(), 1500);
+                const failed = results.filter(r => !r.ok);
+                if (failed.length === 0) {
+                    showToast(`${payloads.length} categor${payloads.length > 1 ? 'ies' : 'y'} saved successfully!`, 'success');
+                    setTimeout(() => resetAll(), 1600);
                 } else {
-                    const errMsg = result?.errors
-                        ? Object.values(result.errors).flat().join(' ')
-                        : result?.title || 'Failed to create category.';
+                    const errMsg = failed[0].data?.errors
+                        ? Object.values(failed[0].data.errors).flat().join(' ')
+                        : failed[0].data?.title || 'Some categories failed to save.';
                     showToast(errMsg, 'danger');
                 }
             } catch (err) {
@@ -433,18 +332,11 @@
             }
         }
 
-        // ── Reset ──
-        function resetForm() {
-            ['categoryName', 'categoryDescription', 'categorySequence', 'parentSequence'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) { el.value = ''; el.classList.remove('is-invalid'); }
-            });
-            document.getElementById('isParent').checked = true;
-            handleParentToggle(document.getElementById('isParent'));
-            document.getElementById('categoryImageInput').value = '';
-            document.getElementById('fileLabel').textContent = 'No file chosen';
-            document.getElementById('fileLabel').style.color = '';
-            document.getElementById('imagePreviewWrapper').style.display = 'none';
+        // ── Reset All ──
+        function resetAll() {
+            document.getElementById('categoriesContainer').innerHTML = '';
+            blockCounter = 0;
+            addCategoryBlock();
         }
 
         // ── Toast ──
@@ -455,11 +347,8 @@
             new bootstrap.Toast(toastEl, { delay: 3500 }).show();
         }
 
-        // Clear errors on input
-        ['categoryName', 'categoryDescription', 'categorySequence', 'parentSequence'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.addEventListener('input', () => clearError(id));
-        });
+        // ── Init with one block ──
+        addCategoryBlock();
     </script>
 </body>
 </html>
