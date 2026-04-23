@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using FAQManagement.Models; // for Faq model
+using FAQManagement.Models;
 
 public class ApplicationDbContext : DbContext
 {
@@ -10,4 +10,5 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Faq> Faqs { get; set; }
     public DbSet<FaqCategory> FaqCategories { get; set; }
+    public DbSet<FaqSubCategory> FaqSubCategories { get; set; }
 }

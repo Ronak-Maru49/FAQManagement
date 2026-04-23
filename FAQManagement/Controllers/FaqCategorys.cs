@@ -8,7 +8,18 @@ namespace FAQManagement.Controllers
         {
             return View();
         }
+
         public IActionResult List()
+        {
+            return View();
+        }
+
+        public IActionResult AddSubCategory()
+        {
+            return View();
+        }
+
+        public IActionResult SubCategoryList()
         {
             return View();
         }
