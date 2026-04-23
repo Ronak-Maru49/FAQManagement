@@ -2,10 +2,10 @@
     ViewData["Title"] = "FAQ Management";
 }
 <div class="mb-3" style="display: flex; justify-content: flex-end; gap: 10px;">
-    <a asp-controller="FaqCategorys" asp-action="SubCategoryList"
-       class="btn btn-primary float-end"
-       style="background-color: #0d6efd; padding: 8px 20px; border-radius: 8px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;">
-        ← Back
+    <a href="javascript:void(0);"
+       onclick="history.back();"
+       class="btn btn-primary float-end d-inline-flex align-items-center gap-2 px-4 py-2 fw-medium rounded-3 text-decoration-none">
+        <span class="me-1">←</span> Back
     </a>
 </div>
 <div class="container mt-4">
