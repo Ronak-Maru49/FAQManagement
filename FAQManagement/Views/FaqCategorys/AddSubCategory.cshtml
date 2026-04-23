@@ -10,19 +10,16 @@
 </head>
 <body>
 
-    <!-- Page Header -->
     <div class="page-header">
         <h5><i class="bi bi-diagram-3 me-2"></i>Add SubCategory</h5>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a asp-action="List" asp-controller="FaqCategorys"><i class="bi bi-house"></i></a></li>
-                <li class="breadcrumb-item"><a asp-action="SubCategoryList" asp-controller="FaqCategorys">SubCategory</a></li>
                 <li class="breadcrumb-item active">Add SubCategory</li>
             </ol>
         </nav>
     </div>
 
-    <!-- Main Content -->
     <div class="container-fluid px-4 py-4">
         <div class="card p-4">
 
@@ -54,7 +51,6 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="appToast" class="toast align-items-center text-white border-0" role="alert">
             <div class="d-flex">
@@ -67,27 +63,17 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const API_BASE = '/api/FaqSubCategory';
-        const CAT_API = '/api/FaqCategory';
         let blockCounter = 0;
-        let allCategories = [];
 
-        // Load parent categories on page load
-        async function loadCategories() {
-            try {
-                const res = await fetch(CAT_API);
-                allCategories = await res.json();
-            } catch (e) {
-                allCategories = [];
-            }
-        }
-
-        function buildCategoryOptions() {
-            return allCategories.map(c =>
-                `<option value="${c.id}">${c.categoryName}</option>`
-            ).join('');
-        }
+        // URL se Category ID nikalna
+        const getUrlId = () => {
+            const parts = window.location.pathname.split('/');
+            return parseInt(parts[parts.length - 1]) || 0;
+        };
+        const TARGET_CATEGORY_ID = getUrlId();
 
         function createBlockHTML(id) {
+            // Parent Category ko hidden input mein rakha hai taaki backend ko mil sake
             return `
             <div class="category-block" id="block-${id}">
                 <div class="block-header">
@@ -100,67 +86,37 @@
                     </button>
                 </div>
 
-                <!-- Parent Category -->
-                <div class="row mb-3 align-items-start">
-                    <div class="col-md-3 col-lg-2">
-                        <label class="form-label">Parent Category <span class="text-danger">*</span></label>
-                    </div>
-                    <div class="col-md-9 col-lg-10">
-                        <select id="categoryId-${id}" class="form-select" onchange="clearErr('categoryId-${id}')">
-                            <option value="">-- Select Category --</option>
-                            ${buildCategoryOptions()}
-                        </select>
-                        <div class="invalid-feedback">Please select a parent category.</div>
-                    </div>
-                </div>
+                <div class="p-4">
+                    <input type="hidden" id="categoryId-${id}" value="${TARGET_CATEGORY_ID}" />
 
-                <!-- SubCategory Name -->
-                <div class="row mb-3 align-items-start">
-                    <div class="col-md-3 col-lg-2">
-                        <label class="form-label">SubCategory Name <span class="text-danger">*</span></label>
-                    </div>
-                    <div class="col-md-9 col-lg-10">
-                        <input type="text" id="subCategoryName-${id}" class="form-control" placeholder="Enter SubCategory Name" oninput="clearErr('subCategoryName-${id}')" />
-                        <div class="invalid-feedback">SubCategory Name is required.</div>
-                    </div>
-                </div>
-
-                <!-- SubCategory Description -->
-                <div class="row mb-3 align-items-start">
-                    <div class="col-md-3 col-lg-2">
-                        <label class="form-label">SubCategory Description <span class="text-danger">*</span></label>
-                    </div>
-                    <div class="col-md-9 col-lg-10">
-                        <input type="text" id="subCategoryDescription-${id}" class="form-control" placeholder="Enter SubCategory Description" oninput="clearErr('subCategoryDescription-${id}')" />
-                        <div class="invalid-feedback">SubCategory Description is required.</div>
-                    </div>
-                </div>
-
-                <!-- SubCategory Image -->
-                <div class="row mb-3 align-items-start">
-                    <div class="col-md-3 col-lg-2">
-                        <label class="form-label">SubCategory Image</label>
-                    </div>
-                    <div class="col-md-9 col-lg-10">
-                        <div class="custom-file-wrapper" onclick="document.getElementById('imageInput-${id}').click()">
-                            <button type="button" class="custom-file-btn">Choose File</button>
-                            <span class="custom-file-label" id="fileLabel-${id}">No file chosen</span>
+                    <div class="row mb-3 align-items-start">
+                        <div class="col-md-3 col-lg-2">
+                            <label class="form-label">SubCategory Name <span class="text-danger">*</span></label>
                         </div>
-                        <input type="file" id="imageInput-${id}" accept="image/*" style="display:none" onchange="handleFileChange(${id}, this)" />
-                        <div id="previewWrapper-${id}" class="mt-2" style="display:none">
-                            <img id="imgPreview-${id}" class="img-preview" src="#" alt="Preview" />
+                        <div class="col-md-9 col-lg-10">
+                            <input type="text" id="subCategoryName-${id}" class="form-control" placeholder="Enter SubCategory Name" oninput="clearErr('subCategoryName-${id}')" />
+                            <div class="invalid-feedback">SubCategory Name is required.</div>
                         </div>
                     </div>
-                </div>
 
-                <!-- SubCategory Sequence -->
-                <div class="row mb-3 align-items-start">
-                    <div class="col-md-3 col-lg-2">
-                        <label class="form-label">Sequence <span class="text-danger">*</span></label>
+                    <div class="row mb-3 align-items-start">
+                        <div class="col-md-3 col-lg-2">
+                            <label class="form-label">SubCategory Description <span class="text-danger">*</span></label>
+                        </div>
+                        <div class="col-md-9 col-lg-10">
+                            <input type="text" id="subCategoryDescription-${id}" class="form-control" placeholder="Enter SubCategory Description" oninput="clearErr('subCategoryDescription-${id}')" />
+                            <div class="invalid-feedback">SubCategory Description is required.</div>
+                        </div>
                     </div>
-                    <div class="col-md-9 col-lg-10">
-                        <input type="number" id="subCategorySequence-${id}" class="form-control" placeholder="Enter Sequence" min="1" oninput="clearErr('subCategorySequence-${id}')" />
-                        <div class="invalid-feedback">Sequence is required and must be a positive number.</div>
+
+                    <div class="row mb-3 align-items-start">
+                        <div class="col-md-3 col-lg-2">
+                            <label class="form-label">Sequence <span class="text-danger">*</span></label>
+                        </div>
+                        <div class="col-md-9 col-lg-10">
+                            <input type="number" id="subCategorySequence-${id}" class="form-control" placeholder="Enter Sequence" min="1" value="${document.querySelectorAll('.category-block').length + 1}" oninput="clearErr('subCategorySequence-${id}')" />
+                            <div class="invalid-feedback">Sequence is required.</div>
+                        </div>
                     </div>
                 </div>
             </div>`;
@@ -178,130 +134,79 @@
         function removeBlock(id) {
             const el = document.getElementById(`block-${id}`);
             if (el) {
-                el.style.transition = 'opacity 0.18s, transform 0.18s';
                 el.style.opacity = '0';
-                el.style.transform = 'translateY(-8px)';
                 setTimeout(() => { el.remove(); updateBlockNumbers(); }, 180);
             }
         }
 
         function updateBlockNumbers() {
             const blocks = document.querySelectorAll('.category-block');
-            const count = blocks.length;
             blocks.forEach((block, i) => {
                 const id = block.id.replace('block-', '');
                 const numEl = document.getElementById(`num-${id}`);
                 if (numEl) numEl.textContent = i + 1;
                 const removeBtn = document.getElementById(`removebtn-${id}`);
-                if (removeBtn) removeBtn.style.display = count > 1 ? '' : 'none';
+                if (removeBtn) removeBtn.style.display = blocks.length > 1 ? '' : 'none';
             });
-            const badge = document.getElementById('countBadge');
-            badge.textContent = count === 1 ? '1 subcategory' : `${count} subcategories`;
+            document.getElementById('countBadge').textContent = `${blocks.length} subcategor${blocks.length === 1 ? 'y' : 'ies'}`;
         }
 
-        function handleFileChange(id, input) {
-            const file = input.files[0];
-            const label = document.getElementById(`fileLabel-${id}`);
-            const wrapper = document.getElementById(`previewWrapper-${id}`);
-            const preview = document.getElementById(`imgPreview-${id}`);
-            if (file) {
-                label.textContent = file.name;
-                label.style.color = '#1a2540';
-                const reader = new FileReader();
-                reader.onload = e => { preview.src = e.target.result; wrapper.style.display = 'block'; };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function clearErr(id) {
-            const el = document.getElementById(id);
-            if (el) el.classList.remove('is-invalid');
-        }
-        function setErr(id) {
-            const el = document.getElementById(id);
-            if (el) el.classList.add('is-invalid');
-        }
+        function clearErr(id) { document.getElementById(id)?.classList.remove('is-invalid'); }
+        function setErr(id) { document.getElementById(id)?.classList.add('is-invalid'); }
 
         function validateBlock(id) {
             let valid = true;
-
-            const catId = document.getElementById(`categoryId-${id}`)?.value;
-            catId ? clearErr(`categoryId-${id}`) : (setErr(`categoryId-${id}`), valid = false);
-
-            const name = document.getElementById(`subCategoryName-${id}`)?.value.trim();
-            name ? clearErr(`subCategoryName-${id}`) : (setErr(`subCategoryName-${id}`), valid = false);
-
-            const desc = document.getElementById(`subCategoryDescription-${id}`)?.value.trim();
-            desc ? clearErr(`subCategoryDescription-${id}`) : (setErr(`subCategoryDescription-${id}`), valid = false);
-
-            const seq = document.getElementById(`subCategorySequence-${id}`)?.value.trim();
-            (seq && !isNaN(seq) && parseInt(seq) >= 1)
-                ? clearErr(`subCategorySequence-${id}`)
-                : (setErr(`subCategorySequence-${id}`), valid = false);
-
+            ['subCategoryName', 'subCategoryDescription', 'subCategorySequence'].forEach(field => {
+                const el = document.getElementById(`${field}-${id}`);
+                if (!el?.value.trim()) { setErr(`${field}-${id}`); valid = false; }
+            });
             return valid;
         }
 
         async function getBlockPayload(id) {
-            let imageBase64 = null;
-            const imageFile = document.getElementById(`imageInput-${id}`)?.files[0];
-            if (imageFile) {
-                imageBase64 = await new Promise(resolve => {
-                    const reader = new FileReader();
-                    reader.onload = e => resolve(e.target.result);
-                    reader.readAsDataURL(imageFile);
-                });
-            }
             return {
                 categoryId: parseInt(document.getElementById(`categoryId-${id}`).value),
                 subCategoryName: document.getElementById(`subCategoryName-${id}`).value.trim(),
                 subCategoryDescription: document.getElementById(`subCategoryDescription-${id}`).value.trim(),
-                subCategoryImage: imageBase64,
-                subCategorySequence: parseInt(document.getElementById(`subCategorySequence-${id}`).value.trim())
+                subCategoryImage: null, // Image remove kar di gayi hai
+                subCategorySequence: parseInt(document.getElementById(`subCategorySequence-${id}`).value)
             };
         }
 
-        function getAllBlockIds() {
-            return [...document.querySelectorAll('.category-block')].map(b => b.id.replace('block-', ''));
-        }
-
         async function saveAll() {
-            const ids = getAllBlockIds();
+            const blocks = document.querySelectorAll('.category-block');
+            const ids = [...blocks].map(b => b.id.replace('block-', ''));
+
             let allValid = true;
             ids.forEach(id => { if (!validateBlock(id)) allValid = false; });
-            if (!allValid) { showToast('Please fix the errors before saving.', 'danger'); return; }
+            if (!allValid) return;
 
-            const saveBtn = document.getElementById('saveBtn');
-            const spinner = document.getElementById('saveSpinner');
-            saveBtn.disabled = true;
-            spinner.classList.remove('d-none');
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            document.getElementById('saveSpinner').classList.remove('d-none');
 
             try {
                 const payloads = await Promise.all(ids.map(id => getBlockPayload(id)));
-
-                const results = await Promise.all(payloads.map(payload =>
+                const results = await Promise.all(payloads.map(p =>
                     fetch(API_BASE, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    }).then(r => r.json().then(data => ({ ok: r.ok, data })))
+                        body: JSON.stringify(p)
+                    })
                 ));
 
-                const failed = results.filter(r => !r.ok);
-                if (failed.length === 0) {
-                    showToast(`${payloads.length} subcategor${payloads.length > 1 ? 'ies' : 'y'} saved successfully!`, 'success');
-                    setTimeout(() => resetAll(), 1600);
+                if (results.every(r => r.ok)) {
+                    showToast('Saved successfully!', 'success');
+                    // Save ke baad wapas SubCategory list par bhej dega
+                    setTimeout(() => window.location.href = `/FaqCategorys/SubCategoryList/${TARGET_CATEGORY_ID}`, 1500);
                 } else {
-                    const errMsg = failed[0].data?.errors
-                        ? Object.values(failed[0].data.errors).flat().join(' ')
-                        : failed[0].data?.title || 'Some subcategories failed to save.';
-                    showToast(errMsg, 'danger');
+                    showToast('Failed to save some items.', 'danger');
                 }
-            } catch (err) {
-                showToast('Network error. Please try again.', 'danger');
+            } catch (e) {
+                showToast('Network error.', 'danger');
             } finally {
-                saveBtn.disabled = false;
-                spinner.classList.add('d-none');
+                btn.disabled = false;
+                document.getElementById('saveSpinner').classList.add('d-none');
             }
         }
 
@@ -311,15 +216,15 @@
             addSubCategoryBlock();
         }
 
-        function showToast(msg, type = 'success') {
+        function showToast(msg, type) {
             const toastEl = document.getElementById('appToast');
             document.getElementById('toastMsg').textContent = msg;
             toastEl.className = `toast align-items-center text-white border-0 bg-${type}`;
-            new bootstrap.Toast(toastEl, { delay: 3500 }).show();
+            bootstrap.Toast.getOrCreateInstance(toastEl).show();
         }
 
-        // Init
-        loadCategories().then(() => addSubCategoryBlock());
+        // Initialize first block
+        addSubCategoryBlock();
     </script>
 </body>
 </html>

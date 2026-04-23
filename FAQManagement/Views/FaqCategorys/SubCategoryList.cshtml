@@ -103,14 +103,6 @@
         gap: 5px;
     }
 
-    .filter-bar {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: wrap;
-        margin-bottom: 15px;
-    }
-
     .no-image-placeholder {
         color: #adb5bd;
         font-size: 0.85rem;
@@ -119,45 +111,35 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="fw-bold">SubCategory List</h5>
-    <a class="btn-add-main" asp-action="AddSubCategory" asp-controller="FaqCategorys">
-        <i class="bi bi-plus-lg"></i> Add SubCategory
-    </a>
-    <a asp-action="List" asp-controller="FaqCategorys" class="btn btn-secondary">
-        <i class="bi bi-arrow-left"></i> Back to List
-    </a>
+    <div class="d-flex gap-2">
+        <button class="btn-add-main" onclick="goToAddSubCategory()">
+            <i class="bi bi-plus-lg"></i> Add SubCategory
+        </button>
+        <a asp-action="List" asp-controller="FaqCategorys" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Main Categories
+        </a>
+    </div>
 </div>
 
-<!-- Filter -->
-<div class="filter-bar">
-    <label class="fw-semibold" style="font-size:0.9rem">Filter by Category:</label>
-    <select id="categoryFilter" class="form-select form-select-sm" style="width:220px" onchange="applyFilter()">
-        <option value="">All Categories</option>
-    </select>
-    <span id="totalCount" class="text-muted" style="font-size:0.85rem"></span>
-</div>
+<input type="hidden" id="categoryFilter" value="" />
 
-<!-- Loading -->
 <div id="loadingSpinner" class="text-center p-5">
     <div class="spinner-border text-primary" role="status"></div>
 </div>
 
-<!-- No Data -->
 <div id="noData" class="text-center p-5" style="display:none;">
     <i class="bi bi-inbox text-muted" style="font-size:2rem"></i>
-    <p class="text-muted mt-2">No subcategories found.</p>
+    <p class="text-muted mt-2">No subcategories found for this category.</p>
 </div>
 
-<!-- Grid -->
 <div id="categoryGrid" class="category-grid" style="display:none;"></div>
 
-<!-- Delete Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0">
             <div class="modal-body text-center p-4">
                 <i class="bi bi-exclamation-circle text-danger" style="font-size:2.5rem"></i>
-                <h6 class="mt-3">Are you sure you want to delete?</h6>
-                <p class="text-muted" style="font-size:0.85rem">This action cannot be undone.</p>
+                <h6 class="mt-3">Are you sure?</h6>
                 <div class="d-flex gap-2 mt-3">
                     <button type="button" class="btn btn-light flex-fill" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-danger flex-fill" onclick="confirmDelete()">
@@ -170,7 +152,6 @@
     </div>
 </div>
 
-<!-- Toast -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="appToast" class="toast align-items-center text-white border-0" role="alert">
         <div class="d-flex">
@@ -182,31 +163,22 @@
 
 <script>
     const API_BASE = '/api/FaqSubCategory';
-    const CAT_API = '/api/FaqCategory';
     let allSubCategories = [];
     let deleteTargetId = null;
     let deleteModalInstance = null;
 
+    // URL se Category ID nikalna
+    const getUrlId = () => {
+        const parts = window.location.pathname.split('/');
+        return parseInt(parts[parts.length - 1]) || 0;
+    };
+    const TARGET_CATEGORY_ID = getUrlId();
+
     document.addEventListener('DOMContentLoaded', async () => {
-        await loadCategoryFilter();
+        // Dropdown ki jagah hidden input mein ID set kar rahe hain logic maintain karne ke liye
+        document.getElementById('categoryFilter').value = TARGET_CATEGORY_ID;
         await loadSubCategories();
     });
-
-    async function loadCategoryFilter() {
-        try {
-            const res = await fetch(CAT_API);
-            const cats = await res.json();
-            const sel = document.getElementById('categoryFilter');
-            cats.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.id;
-                opt.textContent = c.categoryName;
-                sel.appendChild(opt);
-            });
-        } catch (e) {
-            console.error('Failed to load categories', e);
-        }
-    }
 
     async function loadSubCategories() {
         try {
@@ -216,19 +188,16 @@
             applyFilter();
         } catch (e) {
             document.getElementById('loadingSpinner').style.display = 'none';
-            showToast('Failed to load subcategories.', 'danger');
+            showToast('Failed to load.', 'danger');
         }
     }
 
     function applyFilter() {
         const filterVal = document.getElementById('categoryFilter').value;
-        const filtered = filterVal
+        // Agar URL mein ID hai (TARGET_CATEGORY_ID > 0), toh filter apply karo, warna sab dikhao
+        const filtered = filterVal > 0
             ? allSubCategories.filter(s => s.categoryId == filterVal)
             : allSubCategories;
-
-        document.getElementById('totalCount').textContent =
-            filtered.length === 0 ? '' :
-            filtered.length === 1 ? '1 subcategory' : `${filtered.length} subcategories`;
 
         if (filtered.length === 0) {
             document.getElementById('noData').style.display = 'block';
@@ -242,20 +211,16 @@
     function renderGrid(subCategories) {
         const grid = document.getElementById('categoryGrid');
         grid.innerHTML = '';
-
         subCategories.forEach(sub => {
             const html = `
                 <div class="category-card" id="card-${sub.id}">
                     <div class="card-img-top-container">
                         ${sub.subCategoryImage
-                            ? `<img src="${sub.subCategoryImage}" alt="${sub.subCategoryName}"
-                                onerror="this.parentElement.innerHTML='<span class=no-image-placeholder>No Image</span>'">`
+                            ? `<img src="${sub.subCategoryImage}" alt="${sub.subCategoryName}">`
                             : `<span class="no-image-placeholder"><i class="bi bi-image" style="font-size:2rem"></i></span>`}
                     </div>
                     <div class="card-body-content">
-                        <div class="parent-badge">
-                            <i class="bi bi-folder2"></i> ${sub.categoryName || 'Unknown Category'}
-                        </div>
+                        <div class="parent-badge"><i class="bi bi-folder2"></i> ${sub.categoryName || 'General'}</div>
                         <div class="category-title">${sub.subCategoryName || ''}</div>
                         <div class="category-desc">${sub.subCategoryDescription || ''}</div>
                     </div>
@@ -270,8 +235,11 @@
                 </div>`;
             grid.insertAdjacentHTML('beforeend', html);
         });
-
         grid.style.display = 'grid';
+    }
+
+    function goToAddSubCategory() {
+        window.location.href = `/FaqCategorys/AddSubCategory/${TARGET_CATEGORY_ID}`;
     }
 
     function openDeleteModal(id) {
@@ -281,42 +249,24 @@
     }
 
     async function confirmDelete() {
-        if (!deleteTargetId) return;
-
         const spinner = document.getElementById('deleteSpinner');
         spinner.classList.remove('d-none');
-
         try {
             const res = await fetch(`${API_BASE}/${deleteTargetId}`, { method: 'DELETE' });
             if (res.ok) {
                 deleteModalInstance.hide();
-                // Remove card from UI without full reload
-                const card = document.getElementById(`card-${deleteTargetId}`);
-                if (card) {
-                    card.style.transition = 'opacity 0.2s';
-                    card.style.opacity = '0';
-                    setTimeout(() => {
-                        card.remove();
-                        allSubCategories = allSubCategories.filter(s => s.id !== deleteTargetId);
-                        applyFilter();
-                    }, 200);
-                }
-                showToast('SubCategory deleted successfully!', 'success');
-            } else {
-                showToast('Failed to delete. Try again.', 'danger');
+                allSubCategories = allSubCategories.filter(s => s.id !== deleteTargetId);
+                applyFilter();
+                showToast('Deleted successfully!', 'success');
             }
-        } catch (e) {
-            showToast('Network error. Try again.', 'danger');
-        } finally {
-            spinner.classList.add('d-none');
-            deleteTargetId = null;
-        }
+        } catch (e) { showToast('Error occurred.', 'danger'); }
+        finally { spinner.classList.add('d-none'); }
     }
 
     function showToast(msg, type = 'success') {
         const toastEl = document.getElementById('appToast');
         document.getElementById('toastMsg').textContent = msg;
         toastEl.className = `toast align-items-center text-white border-0 bg-${type}`;
-        new bootstrap.Toast(toastEl, { delay: 3000 }).show();
+        new bootstrap.Toast(toastEl).show();
     }
 </script>
