@@ -27,5 +27,11 @@ namespace FAQManagement.Controllers
         {
             return View();
         }
+        [Route("FaqCategorys/EditSubCategory/{id}")]
+        public IActionResult EditSubCategory(int id)
+        {
+            ViewBag.SubCategoryId = id;
+            return View();
+        }
     }
 }

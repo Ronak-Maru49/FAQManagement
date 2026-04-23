@@ -1,0 +1,100 @@
+﻿@{
+    ViewData["Title"] = "Edit SubCategory";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold">Edit SubCategory</h5>
+        </div>
+        <div class="card-body p-4">
+            <form id="editForm">
+                <input type="hidden" id="SubId" />
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">SubCategory Name</label>
+                        <input type="text" id="SubName" class="form-control" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Sequence Order</label>
+                        <input type="number" id="SubSeq" class="form-control" required />
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label fw-semibold">Description</label>
+                        <textarea id="SubDesc" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 border-top pt-3">
+                    <button type="submit" class="btn btn-primary px-4" id="saveBtn">
+                        <span id="btnSpinner" class="spinner-border spinner-border-sm d-none"></span> Save Changes
+                    </button>
+                    <button type="button" class="btn btn-light" onclick="history.back()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SUB_ID = @ViewBag.SubCategoryId;
+    const API_URL = `/api/FaqSubCategory/${SUB_ID}`;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Step 1: Purana data fetch karke form mein bharo
+        try {
+            const res = await fetch(API_URL);
+            if (!res.ok) throw new Error("Fetch failed");
+            const data = await res.json();
+
+            document.getElementById('SubId').value = data.id;
+            document.getElementById('SubName').value = data.subCategoryName;
+            document.getElementById('SubSeq').value = data.subCategorySequence;
+            document.getElementById('SubDesc').value = data.subCategoryDescription;
+            // Note: CategoryId hidden store karein taaki update mein bhej sakein
+            window.CURRENT_CATEGORY_ID = data.categoryId;
+        } catch (e) {
+            alert("Error loading data!");
+        }
+    });
+
+    // Step 2: Form Submit handle karo (PUT request)
+    document.getElementById('editForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('saveBtn');
+        const spinner = document.getElementById('btnSpinner');
+
+        btn.disabled = true;
+        spinner.classList.remove('d-none');
+
+        const payload = {
+            id: parseInt(document.getElementById('SubId').value),
+            categoryId: window.CURRENT_CATEGORY_ID,
+            subCategoryName: document.getElementById('SubName').value,
+            subCategoryDescription: document.getElementById('SubDesc').value,
+            subCategorySequence: parseInt(document.getElementById('SubSeq').value),
+        };
+
+        try {
+            const res = await fetch(API_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                alert("Updated successfully!");
+                window.location.href = `/FaqCategorys/SubCategoryList/${window.CURRENT_CATEGORY_ID}`;
+            } else {
+                const err = await res.json();
+                alert("Error: " + (err.message || "Update failed"));
+            }
+        } catch (e) {
+            alert("Network error!");
+        } finally {
+            btn.disabled = false;
+            spinner.classList.add('d-none');
+        }
+    };
+</script>

@@ -41,7 +41,7 @@
     .sub-desc {
         font-size: 0.85rem;
         color: #6c757d;
-        max-width: 300px;
+        max-width: 250px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -92,24 +92,19 @@
         gap: 5px;
         border: none;
     }
-
-        .btn-add-main:hover {
-            background-color: #0b5ed7;
-            color: white;
-        }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3 mt-4">
     <div>
         <h5 class="fw-bold mb-0">SubCategory List</h5>
-        <p class="text-muted small mb-0">Manage and view subcategories for the selected category.</p>
+        <p class="text-muted small mb-0">Manage subcategories for your FAQ system.</p>
     </div>
     <div class="d-flex gap-2">
         <button class="btn-add-main" onclick="goToAddSubCategory()">
             <i class="bi bi-plus-lg"></i> Add SubCategory
         </button>
-        <a asp-action="List" asp-controller="FaqCategorys" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Back to Main Categories
+        <a href="/FaqCategorys/List" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back
         </a>
     </div>
 </div>
@@ -122,7 +117,7 @@
 
 <div id="noData" class="text-center p-5" style="display:none;">
     <i class="bi bi-inbox text-muted" style="font-size:2rem"></i>
-    <p class="text-muted mt-2">No subcategories found for this category.</p>
+    <p class="text-muted mt-2">No subcategories found.</p>
 </div>
 
 <div id="tableWrapper" class="table-container" style="display:none;">
@@ -134,57 +129,57 @@
                     <th>SubCategory Name</th>
                     <th>Description</th>
                     <th>Parent Category</th>
-                    <th class="text-end" style="min-width: 250px;">Actions</th>
+                    <th class="text-end" style="min-width: 220px;">Actions</th>
                 </tr>
             </thead>
             <tbody id="subCategoryTableBody">
-                <template id="rowTemplate">
-                    <tr>
-                        <td class="row-index text-muted"></td>
-                        <td><div class="sub-title row-name"></div></td>
-                        <td><div class="sub-desc row-desc"></div></td>
-                        <td>
-                            <span class="parent-badge">
-                                <i class="bi bi-folder2 me-1"></i> <span class="row-parent"></span>
-                            </span>
-                        </td>
-                        <td class="text-end">
-                            <div class="d-flex justify-content-end align-items-center gap-2">
-                                <a asp-controller="FAQ" asp-action="Index" class="btn-table-action btn-add-item btn-link-add">
-                                    <i class="bi bi-plus-circle"></i> Add
-                                </a>
-                                <a asp-controller="FAQ" asp-action="List" class="btn-table-action btn-read btn-link-read">
-                                    <i class="bi bi-eye"></i> Read
-                                </a>
-
-                                <div class="btn-group ms-2">
-                                    <a href="/FaqCategorys/EditSubCategory/888" class="btn btn-sm btn-outline-primary btn-link-edit" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <button class="btn btn-sm btn-outline-danger btn-delete-trigger" title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </template>
             </tbody>
         </table>
     </div>
 </div>
 
+<template id="rowTemplate">
+    <tr>
+        <td class="row-index text-muted"></td>
+        <td><div class="sub-title row-name"></div></td>
+        <td><div class="sub-desc row-desc"></div></td>
+        <td>
+            <span class="parent-badge">
+                <i class="bi bi-folder2 me-1"></i> <span class="row-parent"></span>
+            </span>
+        </td>
+        <td class="text-end">
+            <div class="d-flex justify-content-end align-items-center gap-2">
+                <a href="#" class="btn-table-action btn-add-item btn-link-add">
+                    <i class="bi bi-plus-circle"></i> Add FAQ
+                </a>
+                <a href="#" class="btn-table-action btn-read btn-link-read">
+                    <i class="bi bi-eye"></i> View
+                </a>
+                <div class="btn-group ms-2">
+                    <a href="#" class="btn btn-sm btn-outline-primary btn-link-edit" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <button class="btn btn-sm btn-outline-danger btn-delete-trigger" title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </td>
+    </tr>
+</template>
+
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content border-0">
+        <div class="modal-content border-0 shadow">
             <div class="modal-body text-center p-4">
                 <i class="bi bi-exclamation-circle text-danger" style="font-size:2.5rem"></i>
-                <h6 class="mt-3">Are you sure?</h6>
+                <h6 class="mt-3">Delete this item?</h6>
+                <p class="text-muted small">This action cannot be undone.</p>
                 <div class="d-flex gap-2 mt-3">
                     <button type="button" class="btn btn-light flex-fill" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger flex-fill" onclick="confirmDelete()">
-                        <span id="deleteSpinner" class="spinner-border spinner-border-sm me-1 d-none"></span>
-                        Delete
+                    <button type="button" class="btn btn-danger flex-fill" id="confirmDeleteBtn">
+                        <span id="deleteSpinner" class="spinner-border spinner-border-sm me-1 d-none"></span> Delete
                     </button>
                 </div>
             </div>
@@ -207,26 +202,29 @@
     let deleteTargetId = null;
     let deleteModalInstance = null;
 
-    const getUrlId = () => {
-        const parts = window.location.pathname.split('/');
-        return parseInt(parts[parts.length - 1]) || 0;
-    };
-    const TARGET_CATEGORY_ID = getUrlId();
+    // URL se ID nikalne ka robust tarika
+    const pathParts = window.location.pathname.split('/');
+    const TARGET_CATEGORY_ID = parseInt(pathParts[pathParts.length - 1]) || 0;
 
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', () => {
+        deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteModal'));
         document.getElementById('categoryFilter').value = TARGET_CATEGORY_ID;
-        await loadSubCategories();
+
+        document.getElementById('confirmDeleteBtn').onclick = confirmDelete;
+
+        loadSubCategories();
     });
 
     async function loadSubCategories() {
         try {
             const res = await fetch(API_BASE);
+            if (!res.ok) throw new Error();
             allSubCategories = await res.json();
-            document.getElementById('loadingSpinner').style.display = 'none';
             applyFilter();
         } catch (e) {
-            document.getElementById('loadingSpinner').style.display = 'none';
             showToast('Failed to load data.', 'danger');
+        } finally {
+            document.getElementById('loadingSpinner').style.display = 'none';
         }
     }
 
@@ -241,6 +239,7 @@
             document.getElementById('tableWrapper').style.display = 'none';
         } else {
             document.getElementById('noData').style.display = 'none';
+            document.getElementById('tableWrapper').style.display = 'block';
             renderTable(filtered);
         }
     }
@@ -248,73 +247,64 @@
     function renderTable(subCategories) {
         const tbody = document.getElementById('subCategoryTableBody');
         const template = document.getElementById('rowTemplate');
-
-        // Template ke ilawa sab rows clear karein
-        const oldRows = tbody.querySelectorAll('tr:not(#rowTemplate)');
-        oldRows.forEach(r => r.remove());
+        tbody.innerHTML = ""; // Clear existing rows
 
         subCategories.forEach((sub, index) => {
             const clone = template.content.cloneNode(true);
-            const tr = clone.querySelector('tr');
-            tr.id = `row-${sub.id}`;
-
-            // Data Mapping
             clone.querySelector('.row-index').textContent = index + 1;
             clone.querySelector('.row-name').textContent = sub.subCategoryName || 'N/A';
-            clone.querySelector('.row-desc').textContent = sub.subCategoryDescription || 'No description';
-            clone.querySelector('.row-desc').title = sub.subCategoryDescription || '';
+            clone.querySelector('.row-desc').textContent = sub.subCategoryDescription || '-';
+            clone.querySelector('.row-desc').title = sub.subCategoryDescription || ''; // Full text on hover
             clone.querySelector('.row-parent').textContent = sub.categoryName || 'General';
 
-            // Link Replacement (Tag Helper output logic)
-            const addLink = clone.querySelector('.btn-link-add');
-            addLink.href = addLink.href.replace('999', sub.categoryId).replace('888', sub.id);
-
-            const readLink = clone.querySelector('.btn-link-read');
-            readLink.href = readLink.href.replace('888', sub.id);
-
-            const editLink = clone.querySelector('.btn-link-edit');
-            editLink.href = editLink.href.replace('888', sub.id);
+            clone.querySelector('.btn-link-edit').href = `/FaqCategorys/EditSubCategory/${sub.id}`;
+            clone.querySelector('.btn-link-read').href = `/FAQ/List/${sub.id}`;
+            clone.querySelector('.btn-link-add').href = `/FAQ/Index?categoryId=${sub.categoryId}&subCategoryId=${sub.id}`;
 
             const deleteBtn = clone.querySelector('.btn-delete-trigger');
-            deleteBtn.onclick = () => openDeleteModal(sub.id);
+            deleteBtn.onclick = () => {
+                deleteTargetId = sub.id;
+                deleteModalInstance.show();
+            };
 
             tbody.appendChild(clone);
         });
-        document.getElementById('tableWrapper').style.display = 'block';
     }
 
     function goToAddSubCategory() {
         window.location.href = `/FaqCategorys/AddSubCategory/${TARGET_CATEGORY_ID}`;
     }
 
-    function openDeleteModal(id) {
-        deleteTargetId = id;
-        deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteModal'));
-        deleteModalInstance.show();
-    }
-
     async function confirmDelete() {
+        const btn = document.getElementById('confirmDeleteBtn');
         const spinner = document.getElementById('deleteSpinner');
+
+        btn.disabled = true;
         spinner.classList.remove('d-none');
+
         try {
             const res = await fetch(`${API_BASE}/${deleteTargetId}`, { method: 'DELETE' });
             if (res.ok) {
                 deleteModalInstance.hide();
                 allSubCategories = allSubCategories.filter(s => s.id !== deleteTargetId);
                 applyFilter();
-                showToast('Deleted successfully!', 'success');
+                showToast('Deleted successfully!');
+            } else {
+                throw new Error();
             }
         } catch (e) {
-            showToast('Error deleting item.', 'danger');
+            showToast('Could not delete.', 'danger');
         } finally {
+            btn.disabled = false;
             spinner.classList.add('d-none');
         }
     }
 
     function showToast(msg, type = 'success') {
         const toastEl = document.getElementById('appToast');
-        document.getElementById('toastMsg').textContent = msg;
+        const toastMsg = document.getElementById('toastMsg');
+        toastMsg.textContent = msg;
         toastEl.className = `toast align-items-center text-white border-0 bg-${type}`;
-        new bootstrap.Toast(toastEl).show();
+        bootstrap.Toast.getOrCreateInstance(toastEl).show();
     }
 </script>

@@ -15,6 +15,7 @@ namespace FAQManagement.Controllers
             _context = context;
         }
 
+        // 1. GET ALL (With Join for Table View)
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetAll()
         {
@@ -24,64 +25,84 @@ namespace FAQManagement.Controllers
                 from cat in catGroup.DefaultIfEmpty()
                 select new
                 {
-                    sub.Id,
-                    sub.CategoryId,
-                    categoryName = cat != null ? cat.CategoryName : "",
-                    sub.SubCategoryName,
-                    sub.SubCategoryDescription,
-                    sub.SubCategoryImage,
-                    sub.SubCategorySequence
+                    id = sub.Id,
+                    categoryId = sub.CategoryId,
+                    categoryName = cat != null ? cat.CategoryName : "General",
+                    subCategoryName = sub.SubCategoryName,
+                    subCategoryDescription = sub.SubCategoryDescription,
+                    subCategoryImage = sub.SubCategoryImage,
+                    subCategorySequence = sub.SubCategorySequence
                 }
-            ).ToListAsync();
+            ).OrderBy(x => x.subCategorySequence).ToListAsync();
 
             return Ok(result);
         }
 
-        [HttpGet("ByCategory/{categoryId}")]
-        public async Task<ActionResult<IEnumerable<FaqSubCategory>>> GetByCategory(int categoryId)
-        {
-            return await _context.FaqSubCategories
-                .Where(s => s.CategoryId == categoryId)
-                .ToListAsync();
-        }
-
+        // 2. GET BY ID (For Edit Form Binding)
         [HttpGet("{id}")]
         public async Task<ActionResult<FaqSubCategory>> GetById(int id)
         {
             var data = await _context.FaqSubCategories.FindAsync(id);
-            if (data == null) return NotFound();
-            return data;
+            if (data == null) return NotFound(new { message = "Data not found" });
+            return Ok(data);
         }
 
+        // 3. CREATE
         [HttpPost]
         public async Task<ActionResult<FaqSubCategory>> Create(FaqSubCategory subCategory)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             _context.FaqSubCategories.Add(subCategory);
             await _context.SaveChangesAsync();
             return Ok(new { message = "SubCategory created successfully", data = subCategory });
         }
 
+        // 4. FULL FIXED UPDATE (EDIT)
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, FaqSubCategory subCategory)
+        public async Task<IActionResult> Update(int id, [FromBody] FaqSubCategory subCategory)
         {
-            var existing = await _context.FaqSubCategories.FindAsync(id);
-            if (existing == null) return NotFound();
+            if (id != subCategory.Id) return BadRequest(new { message = "ID mismatch" });
 
+            var existing = await _context.FaqSubCategories.FindAsync(id);
+            if (existing == null) return NotFound(new { message = "SubCategory not found" });
+
+            // Basic Fields Update
             existing.CategoryId = subCategory.CategoryId;
             existing.SubCategoryName = subCategory.SubCategoryName;
             existing.SubCategoryDescription = subCategory.SubCategoryDescription;
-            existing.SubCategoryImage = subCategory.SubCategoryImage;
             existing.SubCategorySequence = subCategory.SubCategorySequence;
 
-            await _context.SaveChangesAsync();
-            return Ok(new { message = "SubCategory updated successfully" });
+            // Image Logic: Agar nayi image aayi hai tabhi update karein, 
+            // warna purani wali hi rehne dein (Overwrite protection)
+            if (!string.IsNullOrEmpty(subCategory.SubCategoryImage))
+            {
+                existing.SubCategoryImage = subCategory.SubCategoryImage;
+            }
+
+            try
+            {
+                _context.Entry(existing).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "SubCategory updated successfully" });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.FaqSubCategories.Any(e => e.Id == id)) return NotFound();
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal Server Error", error = ex.Message });
+            }
         }
 
+        // 5. DELETE
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var data = await _context.FaqSubCategories.FindAsync(id);
-            if (data == null) return NotFound();
+            if (data == null) return NotFound(new { message = "Already deleted or not found" });
 
             _context.FaqSubCategories.Remove(data);
             await _context.SaveChangesAsync();
