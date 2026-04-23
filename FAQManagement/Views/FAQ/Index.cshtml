@@ -1,14 +1,16 @@
 ﻿@{
     ViewData["Title"] = "Add FAQ Sections";
 }
+
 <a asp-controller="FaqCategorys" asp-action="SubCategoryList"
    class="btn btn-primary float-end"
    style="background-color: #0d6efd; padding: 8px 20px; border-radius: 8px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;">
     ← Back
 </a>
+
 <div class="container mt-4">
     <h2>Add FAQ Sections</h2>
-    <p class="text-muted">Select the main category in the first section. You can define specific sub-categories for each item.</p>
+    <p class="text-muted">Select the main category in the first section. All items will belong to this category.</p>
 
     <div id="faqSectionsContainer">
         <div class="faq-section" style="background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px; position: relative;">
@@ -18,21 +20,13 @@
                 <div class="col-md-6 mb-3">
                     <label class="fw-bold">Category *</label>
                     <select id="mainCategory" class="form-control" required>
-                        <option value="">Select Category</option>
-                        <option value="AI MVP development">AI MVP development</option>
-                        <option value="AI & Machine Learning Development">AI & Machine Learning Development</option>
-                        <option value="AI Integration">AI Integration</option>
-                        <option value="AI Chatbot Development">AI Chatbot Development</option>
-                        <option value="AI SaaS Development">AI SaaS Development</option>
+                        <option value="">Loading Categories...</option>
                     </select>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="fw-bold">Sub Category</label>
                     <select class="subcategory-input form-control">
                         <option value="">-- Select Sub Category --</option>
-                        <option value="General">General</option>
-                        <option value="Technical">Technical</option>
-                        <option value="Pricing">Pricing</option>
                     </select>
                 </div>
             </div>
@@ -50,8 +44,8 @@
     </div>
 
     <div class="mb-5">
-        <button type="button" id="addMoreBtn" style="background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px;">+ Add Another Section</button>
-        <button type="button" id="submitAllBtn" style="background: green; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px; margin-left: 10px;">Submit All FAQs</button>
+        <button type="button" id="addMoreBtn" class="btn btn-info text-white bg-primary">+ Add Another Section</button>
+        <button type="button" id="submitAllBtn" class="btn btn-success" style="margin-left: 10px;">Submit All FAQs</button>
     </div>
 
     <div id="result" style="margin-top:20px; font-weight: bold;"></div>
@@ -61,22 +55,79 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+            const CAT_API = '/api/FaqCategory';
+            const SUB_CAT_API = '/api/FaqSubCategory';
 
-            // 1. ADD MORE SECTIONS (Includes Sub-Category for every section)
+            // --- 1. Robust URL Parsing ---
+            // Path se numbers nikalne ke liye (e.g., /AddFaq/5/12 -> [5, 12])
+            const pathParts = window.location.pathname.split('/').filter(p => p !== "" && !isNaN(p));
+            let TARGET_PARENT_ID = pathParts.length >= 1 ? parseInt(pathParts[0]) : 0;
+            let TARGET_SUB_ID = pathParts.length >= 2 ? parseInt(pathParts[1]) : 0;
+
+            // Global variable to store subcategories data
+            window.allSubCategories = [];
+
+            // --- 2. Initialize Data ---
+            async function initialize() {
+                try {
+                    // Fetch Parent Categories
+                    const catRes = await fetch(CAT_API);
+                    const categories = await catRes.json();
+
+                    let catHtml = '<option value="">Select Category</option>';
+                    categories.forEach(c => {
+                        let isSelected = (c.id === TARGET_PARENT_ID) ? 'selected' : '';
+                        catHtml += `<option value="${c.id}" ${isSelected}>${c.categoryName}</option>`;
+                    });
+                    $('#mainCategory').html(catHtml);
+
+                    // Fetch All Sub Categories
+                    const subRes = await fetch(SUB_CAT_API);
+                    window.allSubCategories = await subRes.json();
+
+                    // Agar URL mein Parent ID thi, toh initial dropdown populate karein
+                    if (TARGET_PARENT_ID > 0) {
+                        updateSubCategoryDropdowns($('.subcategory-input'), TARGET_SUB_ID);
+                    }
+                } catch (e) {
+                    console.error("Error loading data:", e);
+                    $('#result').html('<span class="text-danger">Error loading categories.</span>');
+                }
+            }
+
+            // --- 3. Function to filter and populate subcategories ---
+            function updateSubCategoryDropdowns(element, selectedId) {
+                const currentParent = $('#mainCategory').val();
+                let subHtml = '<option value="">-- Select Sub Category --</option>';
+
+                if (window.allSubCategories && currentParent) {
+                    const filtered = window.allSubCategories.filter(s => s.categoryId == currentParent);
+                    filtered.forEach(s => {
+                        let isSelected = (s.id == selectedId) ? 'selected' : '';
+                        subHtml += `<option value="${s.id}" ${isSelected}>${s.subCategoryName}</option>`;
+                    });
+                }
+                element.html(subHtml);
+            }
+
+            // Jab Main Category change ho, saare sub-category dropdowns reset karein
+            $(document).on('change', '#mainCategory', function () {
+                $('.subcategory-input').each(function() {
+                    updateSubCategoryDropdowns($(this), 0);
+                });
+            });
+
+            // --- 4. Add More Sections ---
             $('#addMoreBtn').click(function () {
-                var newSection = `
+                const sectionCount = $('.faq-section').length + 1;
+                const newSection = $(`
                     <div class="faq-section" style="background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px; position: relative;">
                         <button type="button" class="remove-section" style="position: absolute; top: 10px; right: 10px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;">&times;</button>
-                        <h5>Additional FAQ Item</h5>
+                        <h5>FAQ Item #${sectionCount}</h5>
 
                         <div class="mb-3">
                             <label class="fw-bold">Sub Category</label>
-                            <select class="subcategory-input form-control">
-                                <option value="">-- Select Sub Category --</option>
-                                <option value="General">General</option>
-                                <option value="Technical">Technical</option>
-                                <option value="Pricing">Pricing</option>
-                            </select>
+                            <select class="subcategory-input form-control"></select>
                         </div>
 
                         <div class="mb-3">
@@ -87,38 +138,36 @@
                             <label class="fw-bold">FAQ Description *</label>
                             <textarea class="answer-input form-control" rows="3" placeholder="Enter description" required></textarea>
                         </div>
-                    </div>`;
+                    </div>`);
+
                 $('#faqSectionsContainer').append(newSection);
+                // Naye dropdown ko current main category ke hisaab se fill karein
+                updateSubCategoryDropdowns(newSection.find('.subcategory-input'), 0);
             });
 
-            // 2. REMOVE A SECTION
+            // --- 5. Remove Section ---
             $(document).on('click', '.remove-section', function () {
                 $(this).closest('.faq-section').remove();
             });
 
-            // 3. SUBMIT ALL SECTIONS
+            // --- 6. Submit Logic ---
             $('#submitAllBtn').click(async function () {
-                // Get the main category from the first section
-                var selectedCategory = $('#mainCategory').val();
-
+                const selectedCategory = $('#mainCategory').val();
                 if (!selectedCategory) {
-                    $('#result').html('<span style="color:red;">Please select a Category in the first section.</span>');
+                    alert("Please select a Category first.");
                     return;
                 }
 
                 const sections = $('.faq-section');
                 let successCount = 0;
-                let errorOccurred = false;
-
-                $('#result').html('<span>Saving...</span>');
+                $('#result').html('<span class="text-primary">Saving FAQs...</span>');
 
                 for (let section of sections) {
-                    var faqData = {
-                        question: $(section).find('.question-input').val(),
-                        answer: $(section).find('.answer-input').val(),
-                        category: selectedCategory,
-                        // Pull the sub-category from THIS specific section
-                        subCategory: $(section).find('.subcategory-input').val()
+                    const faqData = {
+                        question: $(section).find('.question-input').val().trim(),
+                        answer: $(section).find('.answer-input').val().trim(),
+                        categoryId: parseInt(selectedCategory),
+                        subCategoryId: parseInt($(section).find('.subcategory-input').val()) || null
                     };
 
                     if (!faqData.question || !faqData.answer) continue;
@@ -132,20 +181,21 @@
                         });
                         successCount++;
                     } catch (err) {
-                        errorOccurred = true;
+                        console.error("Failed to save an item", err);
                     }
                 }
 
                 if (successCount > 0) {
-                    $('#result').html('<span style="color:green;">Successfully added ' + successCount + ' FAQs!</span>');
-                    $('.question-input, .answer-input, .subcategory-input').val('');
-                    $('.faq-section:not(:first)').remove();
-                }
-
-                if (errorOccurred) {
-                    $('#result').append('<br/><span style="color:red;">Error saving some items.</span>');
+                    $('#result').html(`<span class="text-success">Successfully added ${successCount} FAQs!</span>`);
+                    // Optional: Clear form
+                    $('.question-input, .answer-input').val('');
+                } else {
+                    $('#result').html('<span class="text-danger">No FAQs were saved. Please check the fields.</span>');
                 }
             });
+
+            // Run on load
+            initialize();
         });
     </script>
 }
