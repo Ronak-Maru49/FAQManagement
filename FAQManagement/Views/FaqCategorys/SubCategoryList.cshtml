@@ -47,7 +47,6 @@
         text-overflow: ellipsis;
     }
 
-    /* Action Buttons Styling */
     .btn-table-action {
         font-size: 0.75rem;
         padding: 4px 10px;
@@ -139,6 +138,37 @@
                 </tr>
             </thead>
             <tbody id="subCategoryTableBody">
+                <template id="rowTemplate">
+                    <tr>
+                        <td class="row-index text-muted"></td>
+                        <td><div class="sub-title row-name"></div></td>
+                        <td><div class="sub-desc row-desc"></div></td>
+                        <td>
+                            <span class="parent-badge">
+                                <i class="bi bi-folder2 me-1"></i> <span class="row-parent"></span>
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end align-items-center gap-2">
+                                <a asp-controller="FAQ" asp-action="Index" class="btn-table-action btn-add-item btn-link-add">
+                                    <i class="bi bi-plus-circle"></i> Add
+                                </a>
+                                <a asp-controller="FAQ" asp-action="List" class="btn-table-action btn-read btn-link-read">
+                                    <i class="bi bi-eye"></i> Read
+                                </a>
+
+                                <div class="btn-group ms-2">
+                                    <a href="/FaqCategorys/EditSubCategory/888" class="btn btn-sm btn-outline-primary btn-link-edit" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-danger btn-delete-trigger" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </template>
             </tbody>
         </table>
     </div>
@@ -217,46 +247,38 @@
 
     function renderTable(subCategories) {
         const tbody = document.getElementById('subCategoryTableBody');
-        tbody.innerHTML = '';
+        const template = document.getElementById('rowTemplate');
+
+        // Template ke ilawa sab rows clear karein
+        const oldRows = tbody.querySelectorAll('tr:not(#rowTemplate)');
+        oldRows.forEach(r => r.remove());
 
         subCategories.forEach((sub, index) => {
-            const row = `
-                <tr id="row-${sub.id}">
-                    <td class="text-muted">${index + 1}</td>
-                    <td>
-                        <div class="sub-title">${sub.subCategoryName || 'N/A'}</div>
-                    </td>
-                    <td>
-                        <div class="sub-desc" title="${sub.subCategoryDescription || ''}">
-                            ${sub.subCategoryDescription || 'No description'}
-                        </div>
-                    </td>
-                    <td>
-                        <span class="parent-badge">
-                            <i class="bi bi-folder2 me-1"></i> ${sub.categoryName || 'General'}
-                        </span>
-                    </td>
-                    <td class="text-end">
-                        <div class="d-flex justify-content-end align-items-center gap-2">
-                            <a href="#" class="btn-table-action btn-add-item">
-                                <i class="bi bi-plus-circle"></i> Add
-                            </a>
-                            <a href="#" class="btn-table-action btn-read">
-                                <i class="bi bi-eye"></i> Read
-                            </a>
+            const clone = template.content.cloneNode(true);
+            const tr = clone.querySelector('tr');
+            tr.id = `row-${sub.id}`;
 
-                            <div class="btn-group ms-2">
-                                <a href="/FaqCategorys/EditSubCategory/${sub.id}" class="btn btn-sm btn-outline-primary" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <button class="btn btn-sm btn-outline-danger" onclick="openDeleteModal(${sub.id})" title="Delete">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </td>
-                </tr>`;
-            tbody.insertAdjacentHTML('beforeend', row);
+            // Data Mapping
+            clone.querySelector('.row-index').textContent = index + 1;
+            clone.querySelector('.row-name').textContent = sub.subCategoryName || 'N/A';
+            clone.querySelector('.row-desc').textContent = sub.subCategoryDescription || 'No description';
+            clone.querySelector('.row-desc').title = sub.subCategoryDescription || '';
+            clone.querySelector('.row-parent').textContent = sub.categoryName || 'General';
+
+            // Link Replacement (Tag Helper output logic)
+            const addLink = clone.querySelector('.btn-link-add');
+            addLink.href = addLink.href.replace('999', sub.categoryId).replace('888', sub.id);
+
+            const readLink = clone.querySelector('.btn-link-read');
+            readLink.href = readLink.href.replace('888', sub.id);
+
+            const editLink = clone.querySelector('.btn-link-edit');
+            editLink.href = editLink.href.replace('888', sub.id);
+
+            const deleteBtn = clone.querySelector('.btn-delete-trigger');
+            deleteBtn.onclick = () => openDeleteModal(sub.id);
+
+            tbody.appendChild(clone);
         });
         document.getElementById('tableWrapper').style.display = 'block';
     }
