@@ -4,93 +4,83 @@
 }
 
 <style>
-    .category-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .category-card {
+    .table-container {
         background: #fff;
         border-radius: 10px;
         border: 1px solid #dee2e6;
-        overflow: hidden;
+        padding: 20px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        transition: transform 0.2s;
+        margin-top: 20px;
     }
 
-        .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-    .card-img-top-container {
-        width: 100%;
-        height: 160px;
-        background: #f8f9fa;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    .table thead {
+        background-color: #f8f9fa;
     }
 
-        .card-img-top-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-    .card-body-content {
-        padding: 15px;
-        text-align: center;
-    }
-
-    .category-title {
+    .table th {
         font-weight: 600;
-        font-size: 1rem;
-        margin-bottom: 4px;
         color: #333;
-    }
-
-    .category-desc {
-        font-size: 0.82rem;
-        color: #6c757d;
-        height: 36px;
-        overflow: hidden;
+        border-top: none;
     }
 
     .parent-badge {
-        font-size: 0.72rem;
+        font-size: 0.75rem;
         background: #e8f0fe;
         color: #1a73e8;
         border-radius: 20px;
-        padding: 2px 10px;
+        padding: 4px 12px;
         display: inline-block;
-        margin-bottom: 6px;
-    }
-
-    .card-footer-actions {
-        padding: 12px;
-        background: #fcfcfc;
-        border-top: 1px solid #eee;
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .btn-action {
-        flex: 1;
-        padding: 6px;
-        border-radius: 5px;
-        font-size: 0.85rem;
         font-weight: 500;
+    }
+
+    .sub-title {
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .sub-desc {
+        font-size: 0.85rem;
+        color: #6c757d;
+        max-width: 300px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Action Buttons Styling */
+    .btn-table-action {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        font-weight: 500;
+        border-radius: 4px;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        gap: 5px;
+        gap: 4px;
+        transition: all 0.2s;
     }
+
+    .btn-read {
+        background-color: #f0fdf4;
+        color: #16a34a;
+        border: 1px solid #bbf7d0;
+    }
+
+        .btn-read:hover {
+            background-color: #16a34a;
+            color: white;
+        }
+
+    .btn-add-item {
+        background-color: #fff7ed;
+        color: #ea580c;
+        border: 1px solid #ffedd5;
+    }
+
+        .btn-add-item:hover {
+            background-color: #ea580c;
+            color: white;
+        }
 
     .btn-add-main {
         background-color: #0D6EFD;
@@ -101,16 +91,20 @@
         display: inline-flex;
         align-items: center;
         gap: 5px;
+        border: none;
     }
 
-    .no-image-placeholder {
-        color: #adb5bd;
-        font-size: 0.85rem;
-    }
+        .btn-add-main:hover {
+            background-color: #0b5ed7;
+            color: white;
+        }
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold">SubCategory List</h5>
+    <div>
+        <h5 class="fw-bold mb-0">SubCategory List</h5>
+        <p class="text-muted small mb-0">Manage and view subcategories for the selected category.</p>
+    </div>
     <div class="d-flex gap-2">
         <button class="btn-add-main" onclick="goToAddSubCategory()">
             <i class="bi bi-plus-lg"></i> Add SubCategory
@@ -132,7 +126,23 @@
     <p class="text-muted mt-2">No subcategories found for this category.</p>
 </div>
 
-<div id="categoryGrid" class="category-grid" style="display:none;"></div>
+<div id="tableWrapper" class="table-container" style="display:none;">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>SubCategory Name</th>
+                    <th>Description</th>
+                    <th>Parent Category</th>
+                    <th class="text-end" style="min-width: 250px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="subCategoryTableBody">
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog modal-sm modal-dialog-centered">
@@ -167,7 +177,6 @@
     let deleteTargetId = null;
     let deleteModalInstance = null;
 
-    // URL se Category ID nikalna
     const getUrlId = () => {
         const parts = window.location.pathname.split('/');
         return parseInt(parts[parts.length - 1]) || 0;
@@ -175,7 +184,6 @@
     const TARGET_CATEGORY_ID = getUrlId();
 
     document.addEventListener('DOMContentLoaded', async () => {
-        // Dropdown ki jagah hidden input mein ID set kar rahe hain logic maintain karne ke liye
         document.getElementById('categoryFilter').value = TARGET_CATEGORY_ID;
         await loadSubCategories();
     });
@@ -188,54 +196,69 @@
             applyFilter();
         } catch (e) {
             document.getElementById('loadingSpinner').style.display = 'none';
-            showToast('Failed to load.', 'danger');
+            showToast('Failed to load data.', 'danger');
         }
     }
 
     function applyFilter() {
         const filterVal = document.getElementById('categoryFilter').value;
-        // Agar URL mein ID hai (TARGET_CATEGORY_ID > 0), toh filter apply karo, warna sab dikhao
         const filtered = filterVal > 0
             ? allSubCategories.filter(s => s.categoryId == filterVal)
             : allSubCategories;
 
         if (filtered.length === 0) {
             document.getElementById('noData').style.display = 'block';
-            document.getElementById('categoryGrid').style.display = 'none';
+            document.getElementById('tableWrapper').style.display = 'none';
         } else {
             document.getElementById('noData').style.display = 'none';
-            renderGrid(filtered);
+            renderTable(filtered);
         }
     }
 
-    function renderGrid(subCategories) {
-        const grid = document.getElementById('categoryGrid');
-        grid.innerHTML = '';
-        subCategories.forEach(sub => {
-            const html = `
-                <div class="category-card" id="card-${sub.id}">
-                    <div class="card-img-top-container">
-                        ${sub.subCategoryImage
-                            ? `<img src="${sub.subCategoryImage}" alt="${sub.subCategoryName}">`
-                            : `<span class="no-image-placeholder"><i class="bi bi-image" style="font-size:2rem"></i></span>`}
-                    </div>
-                    <div class="card-body-content">
-                        <div class="parent-badge"><i class="bi bi-folder2"></i> ${sub.categoryName || 'General'}</div>
-                        <div class="category-title">${sub.subCategoryName || ''}</div>
-                        <div class="category-desc">${sub.subCategoryDescription || ''}</div>
-                    </div>
-                    <div class="card-footer-actions">
-                        <a href="/FaqCategorys/EditSubCategory/${sub.id}" class="btn btn-primary btn-action">
-                            <i class="bi bi-pencil-fill"></i> Edit
-                        </a>
-                        <button class="btn btn-danger btn-action" onclick="openDeleteModal(${sub.id})">
-                            <i class="bi bi-trash-fill"></i> Delete
-                        </button>
-                    </div>
-                </div>`;
-            grid.insertAdjacentHTML('beforeend', html);
+    function renderTable(subCategories) {
+        const tbody = document.getElementById('subCategoryTableBody');
+        tbody.innerHTML = '';
+
+        subCategories.forEach((sub, index) => {
+            const row = `
+                <tr id="row-${sub.id}">
+                    <td class="text-muted">${index + 1}</td>
+                    <td>
+                        <div class="sub-title">${sub.subCategoryName || 'N/A'}</div>
+                    </td>
+                    <td>
+                        <div class="sub-desc" title="${sub.subCategoryDescription || ''}">
+                            ${sub.subCategoryDescription || 'No description'}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="parent-badge">
+                            <i class="bi bi-folder2 me-1"></i> ${sub.categoryName || 'General'}
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="#" class="btn-table-action btn-add-item">
+                                <i class="bi bi-plus-circle"></i> Add
+                            </a>
+                            <a href="#" class="btn-table-action btn-read">
+                                <i class="bi bi-eye"></i> Read
+                            </a>
+
+                            <div class="btn-group ms-2">
+                                <a href="/FaqCategorys/EditSubCategory/${sub.id}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button class="btn btn-sm btn-outline-danger" onclick="openDeleteModal(${sub.id})" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>`;
+            tbody.insertAdjacentHTML('beforeend', row);
         });
-        grid.style.display = 'grid';
+        document.getElementById('tableWrapper').style.display = 'block';
     }
 
     function goToAddSubCategory() {
@@ -259,8 +282,11 @@
                 applyFilter();
                 showToast('Deleted successfully!', 'success');
             }
-        } catch (e) { showToast('Error occurred.', 'danger'); }
-        finally { spinner.classList.add('d-none'); }
+        } catch (e) {
+            showToast('Error deleting item.', 'danger');
+        } finally {
+            spinner.classList.add('d-none');
+        }
     }
 
     function showToast(msg, type = 'success') {
