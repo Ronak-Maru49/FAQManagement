@@ -46,7 +46,6 @@
             transform: scale(1.05);
         }
 
-    /* Overlay on image hover */
     .img-overlay {
         position: absolute;
         inset: 0;
@@ -119,6 +118,24 @@
     }
 
     /* Subcategory Modal */
+    #subCatModal .modal-body {
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-bar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+        padding: 10px 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
     .sub-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -180,7 +197,6 @@
         color: #adb5bd;
     }
 
-    /* Inline edit form inside modal */
     .sub-edit-form {
         background: #f8f9fa;
         border-radius: 8px;
@@ -190,6 +206,7 @@
     }
 </style>
 
+<!-- Page Title -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h5 class="page-title">Category List</h5>
     <a class="btn-add-main" asp-action="Index" asp-controller="FaqCategorys">
@@ -197,14 +214,18 @@
     </a>
 </div>
 
+<!-- Loading -->
 <div id="loadingSpinner" class="text-center p-5">
     <div class="spinner-border text-primary" role="status"></div>
 </div>
 
+<!-- No Data -->
 <div id="noData" class="text-center p-5" style="display:none;">
-    <p class="text-muted">No categories found.</p>
+    <i class="bi bi-inbox text-muted" style="font-size:2rem"></i>
+    <p class="text-muted mt-2">No categories found.</p>
 </div>
 
+<!-- Category Grid -->
 <div id="categoryGrid" class="category-grid" style="display:none;"></div>
 
 <!-- ── Category Delete Modal ── -->
@@ -229,8 +250,9 @@
 
 <!-- ── Subcategories Modal ── -->
 <div class="modal fade" id="subCatModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width:95vw;">
+        <div class="modal-content" style="height:90vh;">
+
             <div class="modal-header">
                 <div>
                     <h5 class="modal-title mb-0" id="subModalTitle">Subcategories</h5>
@@ -238,11 +260,36 @@
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
 
-                <!-- Add SubCategory inline form -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span id="subCountBadge" class="badge bg-primary rounded-pill"></span>
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <label class="fw-semibold mb-0" style="font-size:0.88rem">
+                        <i class="bi bi-funnel me-1"></i> Filter:
+                    </label>
+                    <input type="text"
+                           id="subSearchInput"
+                           class="form-control form-control-sm"
+                           style="width:220px"
+                           placeholder="Search subcategory..."
+                           oninput="filterSubGrid()" />
+                    <select id="subSeqSort"
+                            class="form-select form-select-sm"
+                            style="width:190px"
+                            onchange="filterSubGrid()">
+                        <option value="">Sort by Sequence</option>
+                        <option value="asc">Sequence: Low to High</option>
+                        <option value="desc">Sequence: High to Low</option>
+                    </select>
+                    <button class="btn btn-light btn-sm" onclick="resetSubFilter()">
+                        <i class="bi bi-x-circle me-1"></i> Reset
+                    </button>
+                    <span id="subCountBadge" class="badge bg-primary rounded-pill ms-auto"></span>
+                </div>
+
+                <!-- Add SubCategory Button -->
+                <div class="d-flex justify-content-end align-items-center mb-3">
                     <button class="btn btn-primary btn-sm" onclick="toggleAddSubForm()">
                         <i class="bi bi-plus-circle-fill me-1"></i> Add SubCategory
                     </button>
@@ -281,14 +328,18 @@
                     </div>
                 </div>
 
-                <!-- SubCategory Cards -->
+                <!-- SubCategory Loading -->
                 <div id="subLoadingSpinner" class="text-center p-4">
                     <div class="spinner-border spinner-border-sm text-primary"></div>
                 </div>
+
+                <!-- No SubCategory -->
                 <div id="noSubData" class="no-sub" style="display:none">
                     <i class="bi bi-inbox" style="font-size:2rem"></i>
                     <p class="mt-2">No subcategories yet.</p>
                 </div>
+
+                <!-- SubCategory Grid -->
                 <div id="subGrid" class="sub-grid" style="display:none"></div>
 
                 <!-- Inline Edit Form -->
@@ -325,12 +376,13 @@
                         <button class="btn btn-light btn-sm" onclick="closeEditSubForm()">Cancel</button>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
 
-<!-- SubCategory Delete Modal -->
+<!-- ── SubCategory Delete Modal ── -->
 <div class="modal fade" id="deleteSubModal" tabindex="-1">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0">
@@ -369,6 +421,7 @@
     let subModalInstance = null;
     let deleteCatModalInstance = null;
     let deleteSubModalInstance = null;
+    let allLoadedSubs = [];
 
     document.addEventListener('DOMContentLoaded', () => loadCategories());
 
@@ -398,7 +451,7 @@
 
             grid.insertAdjacentHTML('beforeend', `
                 <div class="category-card" id="catcard-${cat.id}">
-                    <div class="card-img-top-container" onclick="openSubCatModal(${cat.id}, '${cat.categoryName}')">
+                    <div class="card-img-top-container" onclick="openSubCatModal(${cat.id}, '${escapeJs(cat.categoryName)}')">
                         ${imgHtml}
                         <div class="img-overlay">
                             <i class="bi bi-grid-3x3-gap"></i> View Subcategories
@@ -437,7 +490,11 @@
             if (res.ok) {
                 deleteCatModalInstance.hide();
                 const card = document.getElementById(`catcard-${deleteCatId}`);
-                if (card) { card.style.opacity = '0'; card.style.transition = 'opacity 0.2s'; setTimeout(() => card.remove(), 200); }
+                if (card) {
+                    card.style.opacity = '0';
+                    card.style.transition = 'opacity 0.2s';
+                    setTimeout(() => card.remove(), 200);
+                }
                 showToast('Category deleted!', 'success');
             } else {
                 showToast('Delete failed.', 'danger');
@@ -460,6 +517,8 @@
         document.getElementById('subGrid').style.display = 'none';
         document.getElementById('noSubData').style.display = 'none';
         document.getElementById('subLoadingSpinner').style.display = 'block';
+        document.getElementById('subSearchInput').value = '';
+        document.getElementById('subSeqSort').value = '';
 
         subModalInstance = new bootstrap.Modal(document.getElementById('subCatModal'));
         subModalInstance.show();
@@ -473,11 +532,13 @@
             const data = await res.json();
             document.getElementById('subLoadingSpinner').style.display = 'none';
 
-            const badge = document.getElementById('subCountBadge');
-            badge.textContent = data.length === 0 ? '0 subcategories' : `${data.length} subcategor${data.length > 1 ? 'ies' : 'y'}`;
+            allLoadedSubs = data;
+
+            updateBadge(data.length);
 
             if (!data || data.length === 0) {
                 document.getElementById('noSubData').style.display = 'block';
+                document.getElementById('subGrid').style.display = 'none';
                 return;
             }
             renderSubGrid(data);
@@ -485,6 +546,11 @@
             document.getElementById('subLoadingSpinner').style.display = 'none';
             showToast('Failed to load subcategories.', 'danger');
         }
+    }
+
+    function updateBadge(count) {
+        document.getElementById('subCountBadge').textContent =
+            count === 0 ? '0 subcategories' : `${count} subcategor${count > 1 ? 'ies' : 'y'}`;
     }
 
     function renderSubGrid(subs) {
@@ -503,7 +569,8 @@
                         <div class="sub-card-desc">${sub.subCategoryDescription || ''}</div>
                     </div>
                     <div class="sub-card-actions">
-                        <button class="btn btn-primary btn-sm" onclick="openEditSubForm(${sub.id}, '${escapeJs(sub.subCategoryName)}', '${escapeJs(sub.subCategoryDescription)}', ${sub.subCategorySequence}, '${sub.subCategoryImage || ''}')">
+                        <button class="btn btn-primary btn-sm"
+                            onclick="openEditSubForm(${sub.id}, '${escapeJs(sub.subCategoryName)}', '${escapeJs(sub.subCategoryDescription)}', ${sub.subCategorySequence}, '${sub.subCategoryImage || ''}')">
                             <i class="bi bi-pencil-fill"></i> Edit
                         </button>
                         <button class="btn btn-danger btn-sm" onclick="openDeleteSubModal(${sub.id})">
@@ -514,6 +581,40 @@
             `);
         });
         grid.style.display = 'grid';
+    }
+
+    // ── Filter & Sort ──
+    function filterSubGrid() {
+        const search = document.getElementById('subSearchInput').value.trim().toLowerCase();
+        const sort = document.getElementById('subSeqSort').value;
+
+        let filtered = [...allLoadedSubs];
+
+        if (search) {
+            filtered = filtered.filter(s =>
+                (s.subCategoryName || '').toLowerCase().includes(search) ||
+                (s.subCategoryDescription || '').toLowerCase().includes(search)
+            );
+        }
+
+        if (sort === 'asc') filtered.sort((a, b) => a.subCategorySequence - b.subCategorySequence);
+        if (sort === 'desc') filtered.sort((a, b) => b.subCategorySequence - a.subCategorySequence);
+
+        updateBadge(filtered.length);
+
+        if (filtered.length === 0) {
+            document.getElementById('subGrid').style.display = 'none';
+            document.getElementById('noSubData').style.display = 'block';
+        } else {
+            document.getElementById('noSubData').style.display = 'none';
+            renderSubGrid(filtered);
+        }
+    }
+
+    function resetSubFilter() {
+        document.getElementById('subSearchInput').value = '';
+        document.getElementById('subSeqSort').value = '';
+        filterSubGrid();
     }
 
     function escapeJs(str) {
@@ -531,7 +632,8 @@
             document.getElementById('newSubDesc').value = '';
             document.getElementById('newSubSeq').value = '';
             document.getElementById('newSubImage').value = '';
-            ['newSubName', 'newSubDesc', 'newSubSeq'].forEach(id => document.getElementById(id).classList.remove('is-invalid'));
+            ['newSubName', 'newSubDesc', 'newSubSeq'].forEach(id =>
+                document.getElementById(id).classList.remove('is-invalid'));
         }
     }
 
@@ -555,11 +657,14 @@
         let imageBase64 = null;
         const file = document.getElementById('newSubImage').files[0];
         if (file) {
-            imageBase64 = await new Promise(r => { const rd = new FileReader(); rd.onload = e => r(e.target.result); rd.readAsDataURL(file); });
+            imageBase64 = await new Promise(r => {
+                const rd = new FileReader();
+                rd.onload = e => r(e.target.result);
+                rd.readAsDataURL(file);
+            });
         }
 
-        const spinner = document.getElementById('addSubSpinner');
-        spinner.classList.remove('d-none');
+        document.getElementById('addSubSpinner').classList.remove('d-none');
 
         try {
             const res = await fetch(SUB_API, {
@@ -586,7 +691,7 @@
         } catch (e) {
             showToast('Network error.', 'danger');
         } finally {
-            spinner.classList.add('d-none');
+            document.getElementById('addSubSpinner').classList.add('d-none');
         }
     }
 
@@ -597,10 +702,8 @@
         document.getElementById('editSubDesc').value = desc;
         document.getElementById('editSubSeq').value = seq;
         document.getElementById('editSubImage').value = '';
-
-        const preview = document.getElementById('editSubImagePreview');
-        preview.innerHTML = img ? `<img src="${img}" style="height:50px;border-radius:4px;margin-top:4px;">` : '';
-
+        document.getElementById('editSubImagePreview').innerHTML =
+            img ? `<img src="${img}" style="height:50px;border-radius:4px;margin-top:4px;">` : '';
         document.getElementById('editSubForm').style.display = 'block';
         document.getElementById('editSubForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -630,11 +733,14 @@
         let imageBase64 = null;
         const file = document.getElementById('editSubImage').files[0];
         if (file) {
-            imageBase64 = await new Promise(r => { const rd = new FileReader(); rd.onload = e => r(e.target.result); rd.readAsDataURL(file); });
+            imageBase64 = await new Promise(r => {
+                const rd = new FileReader();
+                rd.onload = e => r(e.target.result);
+                rd.readAsDataURL(file);
+            });
         }
 
-        const spinner = document.getElementById('editSubSpinner');
-        spinner.classList.remove('d-none');
+        document.getElementById('editSubSpinner').classList.remove('d-none');
 
         try {
             const res = await fetch(`${SUB_API}/${id}`, {
@@ -661,7 +767,7 @@
         } catch (e) {
             showToast('Network error.', 'danger');
         } finally {
-            spinner.classList.add('d-none');
+            document.getElementById('editSubSpinner').classList.add('d-none');
         }
     }
 
@@ -680,10 +786,14 @@
             if (res.ok) {
                 deleteSubModalInstance.hide();
                 const card = document.getElementById(`subcard-${deleteSubId}`);
-                if (card) { card.style.opacity = '0'; card.style.transition = 'opacity 0.2s'; setTimeout(() => { card.remove(); }, 200); }
+                if (card) {
+                    card.style.opacity = '0';
+                    card.style.transition = 'opacity 0.2s';
+                    setTimeout(() => card.remove(), 200);
+                }
+                allLoadedSubs = allLoadedSubs.filter(s => s.id !== deleteSubId);
+                updateBadge(allLoadedSubs.length);
                 showToast('SubCategory deleted!', 'success');
-                // Update badge count
-                await loadSubCategories(currentCategoryId);
             } else {
                 showToast('Delete failed.', 'danger');
             }
