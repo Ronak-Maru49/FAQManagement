@@ -1,0 +1,407 @@
+﻿@{
+    ViewData["Title"] = "Edit Category";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .page-header {
+        background: #fff;
+        border-bottom: 1px solid #dee2e6;
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        .page-header h5 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+    .breadcrumb {
+        margin: 0;
+        font-size: 0.82rem;
+    }
+
+    .card {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .block-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-bottom: 20px;
+        border: 1px solid #e9ecef;
+    }
+
+    .block-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #1a2540;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-save {
+        background: #0d6efd;
+        color: #fff;
+        border: none;
+        padding: 8px 24px;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+        .btn-save:hover {
+            background: #0b5ed7;
+            color: #fff;
+        }
+
+    .btn-reset {
+        background: #f8f9fa;
+        color: #495057;
+        border: 1px solid #dee2e6;
+        padding: 8px 24px;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .custom-file-wrapper {
+        display: flex;
+        align-items: center;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        overflow: hidden;
+        cursor: pointer;
+        width: fit-content;
+    }
+
+    .custom-file-btn {
+        background: #e9ecef;
+        border: none;
+        padding: 6px 14px;
+        font-size: 0.85rem;
+        color: #495057;
+        cursor: pointer;
+    }
+
+    .custom-file-label {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .img-preview {
+        max-height: 120px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+    }
+
+    .current-img-label {
+        font-size: 0.78rem;
+        color: #6c757d;
+        margin-bottom: 4px;
+    }
+</style>
+
+<!-- Page Header -->
+<div class="page-header">
+    <h5><i class="bi bi-pencil-square me-2"></i>Edit Category</h5>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-action="List" asp-controller="FaqCategorys"><i class="bi bi-house"></i></a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-action="List" asp-controller="FaqCategorys">Category</a>
+            </li>
+            <li class="breadcrumb-item active">Edit Category</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Loading State -->
+<div id="pageLoader" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="text-muted mt-2">Loading category...</p>
+</div>
+
+<!-- Main Content -->
+<div id="mainContent" class="container-fluid px-4 py-4" style="display:none">
+    <div class="card p-4">
+
+        <div class="block-header">
+            <div class="block-title">
+                <i class="bi bi-grid text-primary"></i>
+                Category Details
+            </div>
+        </div>
+
+        <!-- Category Name -->
+        <div class="row mb-3 align-items-start">
+            <div class="col-md-3 col-lg-2">
+                <label class="form-label">Category Name <span class="text-danger">*</span></label>
+            </div>
+            <div class="col-md-9 col-lg-10">
+                <input type="text" id="categoryName" class="form-control" placeholder="Enter Category Name" />
+                <div class="invalid-feedback">Category Name is required.</div>
+            </div>
+        </div>
+
+        <!-- Category Description -->
+        <div class="row mb-3 align-items-start">
+            <div class="col-md-3 col-lg-2">
+                <label class="form-label">Category Description <span class="text-danger">*</span></label>
+            </div>
+            <div class="col-md-9 col-lg-10">
+                <input type="text" id="categoryDescription" class="form-control" placeholder="Enter Category Description" />
+                <div class="invalid-feedback">Category Description is required.</div>
+            </div>
+        </div>
+
+        <!-- Category Image -->
+        <div class="row mb-3 align-items-start">
+            <div class="col-md-3 col-lg-2">
+                <label class="form-label">Category Image</label>
+            </div>
+            <div class="col-md-9 col-lg-10">
+                <!-- Current Image -->
+                <div id="currentImgWrapper" style="display:none" class="mb-2">
+                    <div class="current-img-label">Current Image:</div>
+                    <img id="currentImg" src="#" alt="Current" class="img-preview" />
+                </div>
+                <!-- New Image Upload -->
+                <div class="custom-file-wrapper" onclick="document.getElementById('imageInput').click()">
+                    <button type="button" class="custom-file-btn">Choose File</button>
+                    <span class="custom-file-label" id="fileLabel">No file chosen</span>
+                </div>
+                <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleFileChange(this)" />
+                <div id="newImgPreviewWrapper" class="mt-2" style="display:none">
+                    <div class="current-img-label">New Image Preview:</div>
+                    <img id="newImgPreview" class="img-preview" src="#" alt="Preview" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Sequence -->
+        <div class="row mb-3 align-items-start">
+            <div class="col-md-3 col-lg-2">
+                <label class="form-label">Category Sequence <span class="text-danger">*</span></label>
+            </div>
+            <div class="col-md-9 col-lg-10">
+                <input type="number" id="categorySequence" class="form-control" placeholder="Enter Category Sequence" min="1" />
+                <div class="invalid-feedback">Category Sequence is required.</div>
+            </div>
+        </div>
+
+        <!-- Is Parent -->
+        <div class="row mb-3 align-items-start">
+            <div class="col-md-3 col-lg-2">
+                <label class="form-label">Is Parent</label>
+            </div>
+            <div class="col-md-9 col-lg-10 pt-1">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="isParent" onchange="handleParentToggle(this)" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Parent Sequence -->
+        <div class="row mb-3 align-items-start" id="parentSeqRow">
+            <div class="col-md-3 col-lg-2">
+                <label class="form-label">Parent Sequence <span class="text-danger">*</span></label>
+            </div>
+            <div class="col-md-9 col-lg-10">
+                <input type="number" id="parentSequence" class="form-control" placeholder="Enter Parent Sequence" min="1" />
+                <div class="invalid-feedback">Parent Sequence is required.</div>
+            </div>
+        </div>
+
+        <hr class="mt-2" />
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-save" onclick="updateCategory()">
+                <span class="spinner-border spinner-border-sm me-1 d-none" id="saveSpinner"></span>
+                Update
+            </button>
+            <a asp-action="List" asp-controller="FaqCategorys" class="btn btn-reset">Cancel</a>
+        </div>
+
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="appToast" class="toast align-items-center text-white border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-semibold" id="toastMsg"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = '/api/FaqCategory';
+
+    // URL se ID nikalo — /FaqCategorys/Edit/5
+    const pathParts = window.location.pathname.split('/');
+    const categoryId = pathParts[pathParts.length - 1];
+
+    let originalImage = null;
+
+    document.addEventListener('DOMContentLoaded', () => loadCategory());
+
+    // ── Load existing data ──
+    async function loadCategory() {
+        try {
+            const res = await fetch(`${API_BASE}/${categoryId}`);
+            if (!res.ok) { showToast('Category not found.', 'danger'); return; }
+
+            const cat = await res.json();
+
+            document.getElementById('categoryName').value = cat.categoryName || '';
+            document.getElementById('categoryDescription').value = cat.categoryDescription || '';
+            document.getElementById('categorySequence').value = cat.categorySequence || '';
+            document.getElementById('isParent').checked = cat.isParent;
+
+            if (cat.parentSequence) {
+                document.getElementById('parentSequence').value = cat.parentSequence;
+            }
+
+            // Current image show karo
+            if (cat.categoryImage) {
+                originalImage = cat.categoryImage;
+                document.getElementById('currentImg').src = cat.categoryImage;
+                document.getElementById('currentImgWrapper').style.display = 'block';
+            }
+
+            handleParentToggle(document.getElementById('isParent'));
+
+            document.getElementById('pageLoader').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+
+        } catch (e) {
+            showToast('Failed to load category.', 'danger');
+        }
+    }
+
+    // ── Toggle parent sequence ──
+    function handleParentToggle(checkbox) {
+        const row = document.getElementById('parentSeqRow');
+        row.style.display = checkbox.checked ? 'none' : '';
+        if (checkbox.checked) {
+            document.getElementById('parentSequence').value = '';
+            document.getElementById('parentSequence').classList.remove('is-invalid');
+        }
+    }
+
+    // ── File change ──
+    function handleFileChange(input) {
+        const file = input.files[0];
+        if (file) {
+            document.getElementById('fileLabel').textContent = file.name;
+            document.getElementById('fileLabel').style.color = '#1a2540';
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('newImgPreview').src = e.target.result;
+                document.getElementById('newImgPreviewWrapper').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // ── Validate ──
+    function validate() {
+        let valid = true;
+
+        const name = document.getElementById('categoryName').value.trim();
+        if (!name) { document.getElementById('categoryName').classList.add('is-invalid'); valid = false; }
+        else document.getElementById('categoryName').classList.remove('is-invalid');
+
+        const desc = document.getElementById('categoryDescription').value.trim();
+        if (!desc) { document.getElementById('categoryDescription').classList.add('is-invalid'); valid = false; }
+        else document.getElementById('categoryDescription').classList.remove('is-invalid');
+
+        const seq = document.getElementById('categorySequence').value.trim();
+        if (!seq || isNaN(seq) || parseInt(seq) < 1) { document.getElementById('categorySequence').classList.add('is-invalid'); valid = false; }
+        else document.getElementById('categorySequence').classList.remove('is-invalid');
+
+        if (!document.getElementById('isParent').checked) {
+            const pSeq = document.getElementById('parentSequence').value.trim();
+            if (!pSeq || isNaN(pSeq) || parseInt(pSeq) < 1) { document.getElementById('parentSequence').classList.add('is-invalid'); valid = false; }
+            else document.getElementById('parentSequence').classList.remove('is-invalid');
+        }
+
+        return valid;
+    }
+
+    // ── Update ──
+    async function updateCategory() {
+        if (!validate()) { showToast('Please fix the errors.', 'danger'); return; }
+
+        const spinner = document.getElementById('saveSpinner');
+        spinner.classList.remove('d-none');
+
+        // New image select ki hai toh use karo, warna original rakho
+        let imageBase64 = originalImage;
+        const file = document.getElementById('imageInput').files[0];
+        if (file) {
+            imageBase64 = await new Promise(r => {
+                const rd = new FileReader();
+                rd.onload = e => r(e.target.result);
+                rd.readAsDataURL(file);
+            });
+        }
+
+        const payload = {
+            id: parseInt(categoryId),
+            categoryName: document.getElementById('categoryName').value.trim(),
+            categoryDescription: document.getElementById('categoryDescription').value.trim(),
+            categoryImage: imageBase64,
+            categorySequence: parseInt(document.getElementById('categorySequence').value.trim()),
+            isParent: document.getElementById('isParent').checked,
+            parentSequence: !document.getElementById('isParent').checked
+                ? parseInt(document.getElementById('parentSequence').value.trim()) || null
+                : null
+        };
+
+        try {
+            const res = await fetch(`${API_BASE}/${categoryId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                showToast('Category updated successfully!', 'success');
+                setTimeout(() => window.location.href = '/FaqCategorys/List', 1500);
+            } else {
+                const err = await res.json();
+                const msg = err?.errors
+                    ? Object.values(err.errors).flat().join(' ')
+                    : err?.title || 'Update failed.';
+                showToast(msg, 'danger');
+            }
+        } catch (e) {
+            showToast('Network error.', 'danger');
+        } finally {
+            spinner.classList.add('d-none');
+        }
+    }
+
+    // ── Toast ──
+    function showToast(msg, type = 'success') {
+        const toastEl = document.getElementById('appToast');
+        document.getElementById('toastMsg').textContent = msg;
+        toastEl.className = `toast align-items-center text-white border-0 bg-${type}`;
+        new bootstrap.Toast(toastEl, { delay: 3500 }).show();
+    }
+</script>
