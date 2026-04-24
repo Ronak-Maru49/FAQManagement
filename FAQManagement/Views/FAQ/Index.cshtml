@@ -175,12 +175,17 @@
                     }
                 }
 
-                if (successCount > 0) {
-                    $('#result').html(`<span class="text-success">Successfully added ${successCount} FAQs!</span>`);
-                    $('.question-input, .answer-input').val('');
-                } else {
-                    $('#result').html('<span class="text-danger">No FAQs were saved. Please check the fields.</span>');
-                }
+             if (successCount > 0) {
+            $('#result').html(`<span class="text-success">Successfully added ${successCount} FAQs!</span>`);
+            $('.question-input, .answer-input').val('');
+
+            // 1.5 second baad back jaao
+            setTimeout(function () {
+                history.back();
+            }, 1500);
+             } else {
+            $('#result').html('<span class="text-danger">No FAQs were saved. Please check the fields.</span>');
+                 }
             });
 
             initialize();
