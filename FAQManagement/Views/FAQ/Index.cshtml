@@ -59,9 +59,10 @@
             const CAT_API = '/api/FaqCategory';
             const SUB_CAT_API = '/api/FaqSubCategory';
 
-            // URL se categoryId nikalo — ?categoryId=5
+            // URL se categoryId aur subCategoryId dono nikalo
             const urlParams = new URLSearchParams(window.location.search);
             const TARGET_PARENT_ID = parseInt(urlParams.get('categoryId')) || 0;
+            const TARGET_SUB_ID = parseInt(urlParams.get('subCategoryId')) || 0;
 
             window.allSubCategories = [];
 
@@ -73,6 +74,7 @@
 
                     let catHtml = '<option value="">Select Category</option>';
                     categories.forEach(c => {
+                        // TARGET_PARENT_ID se match karo — auto select
                         let isSelected = (c.id === TARGET_PARENT_ID) ? 'selected' : '';
                         catHtml += `<option value="${c.id}" ${isSelected}>${c.categoryName}</option>`;
                     });
@@ -83,8 +85,9 @@
                     window.allSubCategories = await subRes.json();
 
                     // Agar category pre-selected hai toh subcategory dropdown bhi fill karo
+                    // TARGET_SUB_ID pass karo taaki woh bhi auto select ho
                     if (TARGET_PARENT_ID > 0) {
-                        updateSubCategoryDropdowns($('.subcategory-input'), 0);
+                        updateSubCategoryDropdowns($('.subcategory-input'), TARGET_SUB_ID);
                     }
 
                 } catch (e) {
@@ -100,6 +103,7 @@
                 if (window.allSubCategories && currentParent) {
                     const filtered = window.allSubCategories.filter(s => s.categoryId == currentParent);
                     filtered.forEach(s => {
+                        // selectedId se match karo — auto select
                         let isSelected = (s.id == selectedId) ? 'selected' : '';
                         subHtml += `<option value="${s.id}" ${isSelected}>${s.subCategoryName}</option>`;
                     });
@@ -138,6 +142,7 @@
                     </div>`);
 
                 $('#faqSectionsContainer').append(newSection);
+                // Naye section mein subcategory fill karo — selected nahi hogi (0)
                 updateSubCategoryDropdowns(newSection.find('.subcategory-input'), 0);
             });
 
