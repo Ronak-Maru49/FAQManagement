@@ -59,19 +59,15 @@
             const CAT_API = '/api/FaqCategory';
             const SUB_CAT_API = '/api/FaqSubCategory';
 
-            // --- 1. Robust URL Parsing ---
-            // Path se numbers nikalne ke liye (e.g., /AddFaq/5/12 -> [5, 12])
-            const pathParts = window.location.pathname.split('/').filter(p => p !== "" && !isNaN(p));
-            let TARGET_PARENT_ID = pathParts.length >= 1 ? parseInt(pathParts[0]) : 0;
-            let TARGET_SUB_ID = pathParts.length >= 2 ? parseInt(pathParts[1]) : 0;
+            // URL se categoryId nikalo — ?categoryId=5
+            const urlParams = new URLSearchParams(window.location.search);
+            const TARGET_PARENT_ID = parseInt(urlParams.get('categoryId')) || 0;
 
-            // Global variable to store subcategories data
             window.allSubCategories = [];
 
-            // --- 2. Initialize Data ---
             async function initialize() {
                 try {
-                    // Fetch Parent Categories
+                    // Categories fetch karo
                     const catRes = await fetch(CAT_API);
                     const categories = await catRes.json();
 
@@ -82,21 +78,21 @@
                     });
                     $('#mainCategory').html(catHtml);
 
-                    // Fetch All Sub Categories
+                    // SubCategories fetch karo
                     const subRes = await fetch(SUB_CAT_API);
                     window.allSubCategories = await subRes.json();
 
-                    // Agar URL mein Parent ID thi, toh initial dropdown populate karein
+                    // Agar category pre-selected hai toh subcategory dropdown bhi fill karo
                     if (TARGET_PARENT_ID > 0) {
-                        updateSubCategoryDropdowns($('.subcategory-input'), TARGET_SUB_ID);
+                        updateSubCategoryDropdowns($('.subcategory-input'), 0);
                     }
+
                 } catch (e) {
                     console.error("Error loading data:", e);
                     $('#result').html('<span class="text-danger">Error loading categories.</span>');
                 }
             }
 
-            // --- 3. Function to filter and populate subcategories ---
             function updateSubCategoryDropdowns(element, selectedId) {
                 const currentParent = $('#mainCategory').val();
                 let subHtml = '<option value="">-- Select Sub Category --</option>';
@@ -111,14 +107,14 @@
                 element.html(subHtml);
             }
 
-            // Jab Main Category change ho, saare sub-category dropdowns reset karein
+            // Main category change hone par saare sub dropdowns update karo
             $(document).on('change', '#mainCategory', function () {
-                $('.subcategory-input').each(function() {
+                $('.subcategory-input').each(function () {
                     updateSubCategoryDropdowns($(this), 0);
                 });
             });
 
-            // --- 4. Add More Sections ---
+            // Add More Section
             $('#addMoreBtn').click(function () {
                 const sectionCount = $('.faq-section').length + 1;
                 const newSection = $(`
@@ -142,16 +138,15 @@
                     </div>`);
 
                 $('#faqSectionsContainer').append(newSection);
-                // Naye dropdown ko current main category ke hisaab se fill karein
                 updateSubCategoryDropdowns(newSection.find('.subcategory-input'), 0);
             });
 
-            // --- 5. Remove Section ---
+            // Remove Section
             $(document).on('click', '.remove-section', function () {
                 $(this).closest('.faq-section').remove();
             });
 
-            // --- 6. Submit Logic ---
+            // Submit
             $('#submitAllBtn').click(async function () {
                 const selectedCategory = $('#mainCategory').val();
                 if (!selectedCategory) {
@@ -188,14 +183,12 @@
 
                 if (successCount > 0) {
                     $('#result').html(`<span class="text-success">Successfully added ${successCount} FAQs!</span>`);
-                    // Optional: Clear form
                     $('.question-input, .answer-input').val('');
                 } else {
                     $('#result').html('<span class="text-danger">No FAQs were saved. Please check the fields.</span>');
                 }
             });
 
-            // Run on load
             initialize();
         });
     </script>
