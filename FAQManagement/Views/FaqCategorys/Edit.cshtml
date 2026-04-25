@@ -111,7 +111,6 @@
     }
 </style>
 
-<!-- Page Header -->
 <div class="page-header">
     <h5><i class="bi bi-pencil-square me-2"></i>Edit Category</h5>
     <nav aria-label="breadcrumb">
@@ -127,13 +126,11 @@
     </nav>
 </div>
 
-<!-- Loading State -->
 <div id="pageLoader" class="text-center p-5">
     <div class="spinner-border text-primary" role="status"></div>
     <p class="text-muted mt-2">Loading category...</p>
 </div>
 
-<!-- Main Content -->
 <div id="mainContent" class="container-fluid px-4 py-4" style="display:none">
     <div class="card p-4">
 
@@ -144,7 +141,6 @@
             </div>
         </div>
 
-        <!-- Category Name -->
         <div class="row mb-3 align-items-start">
             <div class="col-md-3 col-lg-2">
                 <label class="form-label">Category Name <span class="text-danger">*</span></label>
@@ -155,7 +151,6 @@
             </div>
         </div>
 
-        <!-- Category Description -->
         <div class="row mb-3 align-items-start">
             <div class="col-md-3 col-lg-2">
                 <label class="form-label">Category Description <span class="text-danger">*</span></label>
@@ -166,18 +161,15 @@
             </div>
         </div>
 
-        <!-- Category Image -->
         <div class="row mb-3 align-items-start">
             <div class="col-md-3 col-lg-2">
                 <label class="form-label">Category Image</label>
             </div>
             <div class="col-md-9 col-lg-10">
-                <!-- Current Image -->
                 <div id="currentImgWrapper" style="display:none" class="mb-2">
                     <div class="current-img-label">Current Image:</div>
                     <img id="currentImg" src="#" alt="Current" class="img-preview" />
                 </div>
-                <!-- New Image Upload -->
                 <div class="custom-file-wrapper" onclick="document.getElementById('imageInput').click()">
                     <button type="button" class="custom-file-btn">Choose File</button>
                     <span class="custom-file-label" id="fileLabel">No file chosen</span>
@@ -190,7 +182,6 @@
             </div>
         </div>
 
-        <!-- Category Sequence -->
         <div class="row mb-3 align-items-start">
             <div class="col-md-3 col-lg-2">
                 <label class="form-label">Category Sequence <span class="text-danger">*</span></label>
@@ -201,32 +192,8 @@
             </div>
         </div>
 
-        <!-- Is Parent -->
-        <div class="row mb-3 align-items-start">
-            <div class="col-md-3 col-lg-2">
-                <label class="form-label">Is Parent</label>
-            </div>
-            <div class="col-md-9 col-lg-10 pt-1">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="isParent" onchange="handleParentToggle(this)" />
-                </div>
-            </div>
-        </div>
-
-        <!-- Parent Sequence -->
-        <div class="row mb-3 align-items-start" id="parentSeqRow">
-            <div class="col-md-3 col-lg-2">
-                <label class="form-label">Parent Sequence <span class="text-danger">*</span></label>
-            </div>
-            <div class="col-md-9 col-lg-10">
-                <input type="number" id="parentSequence" class="form-control" placeholder="Enter Parent Sequence" min="1" />
-                <div class="invalid-feedback">Parent Sequence is required.</div>
-            </div>
-        </div>
-
         <hr class="mt-2" />
 
-        <!-- Action Buttons -->
         <div class="d-flex justify-content-end gap-2">
             <button type="button" class="btn btn-save" onclick="updateCategory()">
                 <span class="spinner-border spinner-border-sm me-1 d-none" id="saveSpinner"></span>
@@ -238,7 +205,6 @@
     </div>
 </div>
 
-<!-- Toast -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="appToast" class="toast align-items-center text-white border-0" role="alert">
         <div class="d-flex">
@@ -270,11 +236,6 @@
             document.getElementById('categoryName').value = cat.categoryName || '';
             document.getElementById('categoryDescription').value = cat.categoryDescription || '';
             document.getElementById('categorySequence').value = cat.categorySequence || '';
-            document.getElementById('isParent').checked = cat.isParent;
-
-            if (cat.parentSequence) {
-                document.getElementById('parentSequence').value = cat.parentSequence;
-            }
 
             // Current image show karo
             if (cat.categoryImage) {
@@ -283,23 +244,11 @@
                 document.getElementById('currentImgWrapper').style.display = 'block';
             }
 
-            handleParentToggle(document.getElementById('isParent'));
-
             document.getElementById('pageLoader').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
 
         } catch (e) {
             showToast('Failed to load category.', 'danger');
-        }
-    }
-
-    // ── Toggle parent sequence ──
-    function handleParentToggle(checkbox) {
-        const row = document.getElementById('parentSeqRow');
-        row.style.display = checkbox.checked ? 'none' : '';
-        if (checkbox.checked) {
-            document.getElementById('parentSequence').value = '';
-            document.getElementById('parentSequence').classList.remove('is-invalid');
         }
     }
 
@@ -334,12 +283,6 @@
         if (!seq || isNaN(seq) || parseInt(seq) < 1) { document.getElementById('categorySequence').classList.add('is-invalid'); valid = false; }
         else document.getElementById('categorySequence').classList.remove('is-invalid');
 
-        if (!document.getElementById('isParent').checked) {
-            const pSeq = document.getElementById('parentSequence').value.trim();
-            if (!pSeq || isNaN(pSeq) || parseInt(pSeq) < 1) { document.getElementById('parentSequence').classList.add('is-invalid'); valid = false; }
-            else document.getElementById('parentSequence').classList.remove('is-invalid');
-        }
-
         return valid;
     }
 
@@ -366,11 +309,7 @@
             categoryName: document.getElementById('categoryName').value.trim(),
             categoryDescription: document.getElementById('categoryDescription').value.trim(),
             categoryImage: imageBase64,
-            categorySequence: parseInt(document.getElementById('categorySequence').value.trim()),
-            isParent: document.getElementById('isParent').checked,
-            parentSequence: !document.getElementById('isParent').checked
-                ? parseInt(document.getElementById('parentSequence').value.trim()) || null
-                : null
+            categorySequence: parseInt(document.getElementById('categorySequence').value.trim())
         };
 
         try {
