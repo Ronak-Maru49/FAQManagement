@@ -59,47 +59,9 @@
             <a class="nav-link active" asp-controller="Home" asp-action="Index">
                 🏠 Dashboard
             </a><br />
-            <a class="nav-link active" asp-controller="FaqCategorys" asp-action="List">
-                All In One
-            </a>
-
-            <!-- FAQ Menu -->
-            <a class="nav-link text-white mt-2" data-bs-toggle="collapse" href="#faqMenu" role="button">
+            <a class="nav-link" asp-controller="FaqCategorys" asp-action="List">
                 📋 FAQ
             </a>
-
-            <div class="collapse ps-3" id="faqMenu">
-                <a class="nav-link text-white" asp-controller="FAQ" asp-action="List">
-                    📄 FAQ List
-                </a>
-                <a class="nav-link text-white" asp-controller="FAQ" asp-action="Index">
-                    ➕ Add FAQ
-                </a>
-            </div>
-
-            <!-- FAQ Category Menu -->
-            <a class="nav-link text-white mt-2" data-bs-toggle="collapse" href="#categoryMenu" role="button">
-                🗂️ FAQ Categories
-            </a>
-
-            <div class="collapse ps-3" id="categoryMenu">
-                <a class="nav-link text-white" asp-controller="FaqCategorys" asp-action="List">
-                    📄 Category List
-                </a>
-                <a class="nav-link text-white" asp-controller="FaqCategorys" asp-action="SubCategoryList">
-                    📄 SubCategory List
-                </a>
-                <a class="nav-link text-white" asp-controller="FaqCategorys" asp-action="Index">
-                    ➕ Add Category
-                </a>
-                <a class="nav-link text-white" asp-controller="FaqCategorys" asp-action="AddSubCategory">
-                    ➕ Add Sub Category
-                </a>
-                <a class="nav-link text-white" asp-controller="FaqCategorys" asp-action="Edit">
-                     Edit Sub Category
-                </a>
-            </div>
- 
                 <a class="nav-link text-white mt-2 d-flex align-items-center gap-2"
                    asp-controller="AiFaqGen"
                    asp-action="Index">
