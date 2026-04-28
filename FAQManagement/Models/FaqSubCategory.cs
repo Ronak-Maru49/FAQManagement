@@ -12,7 +12,6 @@ namespace FAQManagement.Models
         [Required]
         public string SubCategoryName { get; set; } = string.Empty;
 
-        [Required]
         public string SubCategoryDescription { get; set; } = string.Empty;
 
         public string? SubCategoryImage { get; set; }
