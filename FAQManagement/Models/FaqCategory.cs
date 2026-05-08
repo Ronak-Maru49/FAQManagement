@@ -1,24 +1,29 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
 
-namespace FAQManagement.Models
+namespace FAQManagement.Models;
+
+public partial class FaqCategory
 {
-    public class FaqCategory
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        [Required]
-        public string CategoryName { get; set; } = string.Empty;
+    public string CategoryName { get; set; } = null!;
 
-        [Required]
-        public string CategoryDescription { get; set; } = string.Empty;
+    public string CategoryDescription { get; set; } = null!;
 
-        public string? CategoryImage { get; set; }
+    public string? CategoryImage { get; set; }
 
-        [Required]
-        public int CategorySequence { get; set; }
+    public int CategorySequence { get; set; }
 
-        public bool IsParent { get; set; }
+    public bool IsParent { get; set; }
 
-        public int? ParentSequence { get; set; }
-    }
+    public int? ParentSequence { get; set; }
+
+    public int? ParentId { get; set; }
+
+    public virtual ICollection<FaqSubCategory> FaqSubCategories { get; set; } = new List<FaqSubCategory>();
+
+    public virtual ICollection<FaqCategory> InverseParent { get; set; } = new List<FaqCategory>();
+
+    public virtual FaqCategory? Parent { get; set; }
 }

@@ -1,22 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
 
-namespace FAQManagement.Models
+namespace FAQManagement.Models;
+
+public partial class FaqSubCategory
 {
-    public class FaqSubCategory
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        [Required]
-        public int CategoryId { get; set; }
+    public int CategoryId { get; set; }
 
-        [Required]
-        public string SubCategoryName { get; set; } = string.Empty;
+    public string SubCategoryName { get; set; } = null!;
 
-        public string SubCategoryDescription { get; set; } = string.Empty;
+    public string SubCategoryDescription { get; set; } = null!;
 
-        public string? SubCategoryImage { get; set; }
+    public string? SubCategoryImage { get; set; }
 
-        [Required]
-        public int SubCategorySequence { get; set; }
-    }
+    public int SubCategorySequence { get; set; }
+
+    public string? Questions { get; set; }
+
+    public string? Ans { get; set; }
 }

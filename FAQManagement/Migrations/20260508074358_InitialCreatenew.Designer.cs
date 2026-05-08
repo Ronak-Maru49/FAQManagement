@@ -11,18 +11,54 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAQManagement.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260423060409_AddFaqSubCategory")]
-    partial class AddFaqSubCategory
+    [Migration("20260508074358_InitialCreatenew")]
+    partial class InitialCreatenew
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.26")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("FAQManagement.Models.Faq", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FaqSubCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubCategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Faqs");
+                });
 
             modelBuilder.Entity("FAQManagement.Models.FaqCategory", b =>
                 {
@@ -49,10 +85,15 @@ namespace FAQManagement.Migrations
                     b.Property<bool>("IsParent")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ParentSequence")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("FaqCategories");
                 });
@@ -65,8 +106,17 @@ namespace FAQManagement.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Ans")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
+
+                    b.Property<int?>("FaqCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Questions")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SubCategoryDescription")
                         .IsRequired()
@@ -84,28 +134,32 @@ namespace FAQManagement.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FaqCategoryId");
+
                     b.ToTable("FaqSubCategories");
                 });
 
-            modelBuilder.Entity("Faq", b =>
+            modelBuilder.Entity("FAQManagement.Models.FaqCategory", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.HasOne("FAQManagement.Models.FaqCategory", "Parent")
+                        .WithMany("InverseParent")
+                        .HasForeignKey("ParentId");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Navigation("Parent");
+                });
 
-                    b.Property<string>("Answer")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+            modelBuilder.Entity("FAQManagement.Models.FaqSubCategory", b =>
+                {
+                    b.HasOne("FAQManagement.Models.FaqCategory", null)
+                        .WithMany("FaqSubCategories")
+                        .HasForeignKey("FaqCategoryId");
+                });
 
-                    b.Property<string>("Question")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+            modelBuilder.Entity("FAQManagement.Models.FaqCategory", b =>
+                {
+                    b.Navigation("FaqSubCategories");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Faqs");
+                    b.Navigation("InverseParent");
                 });
 #pragma warning restore 612, 618
         }
